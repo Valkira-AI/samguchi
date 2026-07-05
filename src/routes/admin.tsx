@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { Download, Trash2, ArrowLeft } from "lucide-react";
-import { deleteOrder, updateOrderState, useOrders, type Order } from "@/lib/orders-store";
-import { formatARS } from "@/lib/products";
+import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock } from "lucide-react";
+import { updateOrderState, useOrders, type Order } from "@/lib/orders-store";
+import { PRODUCTS, formatARS, type Product } from "@/lib/products";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -16,169 +16,422 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-const ESTADOS: Order["estado"][] = ["Nuevo", "En Preparación", "Despachado", "Finalizado"];
+const PASSWORD = "samguchi2024";
+
+type Section = "pedidos" | "catalogo" | "reportes";
+
+/* ---------- demo prototype data ---------- */
+type DemoOrder = {
+  id: string;
+  estado: Order["estado"];
+  cliente: string;
+  hora: string;
+  items: { cant: number; nombre: string }[];
+  total: number;
+};
+const DEMO_ORDERS: DemoOrder[] = [
+  { id: "#1001", estado: "Nuevo", cliente: "Marcos R.", hora: "14:32 hs", items: [{ cant: 2, nombre: "Milanesa Simple" }, { cant: 2, nombre: "Coca-Cola 500ml" }], total: 8800 },
+  { id: "#1002", estado: "En Preparación", cliente: "Laura G.", hora: "14:25 hs", items: [{ cant: 1, nombre: "Lomito Simple" }, { cant: 1, nombre: "Agua Mineral 500ml" }], total: 6600 },
+  { id: "#1003", estado: "Despachado", cliente: "Diego M.", hora: "14:10 hs", items: [{ cant: 1, nombre: "Hamburguesa Clásica" }, { cant: 1, nombre: "Jugo Natural" }], total: 5700 },
+  { id: "#1004", estado: "Finalizado", cliente: "Sofía P.", hora: "13:55 hs", items: [{ cant: 2, nombre: "Milanesa Completa" }], total: 9000 },
+  { id: "#1005", estado: "Finalizado", cliente: "Julián A.", hora: "13:40 hs", items: [{ cant: 1, nombre: "Lomito Completo" }, { cant: 2, nombre: "Coca-Cola 500ml" }], total: 8800 },
+];
+
+const NEXT_STATE: Record<Order["estado"], Order["estado"] | null> = {
+  Nuevo: "En Preparación",
+  "En Preparación": "Despachado",
+  Despachado: "Finalizado",
+  Finalizado: null,
+};
+
+const ESTADO_STYLES: Record<Order["estado"], string> = {
+  Nuevo: "bg-yellow-100 text-yellow-800 border-yellow-300",
+  "En Preparación": "bg-blue-100 text-blue-800 border-blue-300",
+  Despachado: "bg-orange-100 text-orange-800 border-orange-300",
+  Finalizado: "bg-emerald-100 text-emerald-800 border-emerald-300",
+};
 
 function Admin() {
-  const orders = useOrders();
-  const [filtro, setFiltro] = useState<Order["estado"] | "Todos">("Todos");
+  const [authed, setAuthed] = useState(false);
+  const [pwd, setPwd] = useState("");
+  const [error, setError] = useState(false);
+  const [section, setSection] = useState<Section>("pedidos");
 
-  const shown = useMemo(
-    () => (filtro === "Todos" ? orders : orders.filter((o) => o.estado === filtro)),
-    [orders, filtro],
+  if (!authed) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (pwd === PASSWORD) { setAuthed(true); setError(false); }
+            else setError(true);
+          }}
+          className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-warm"
+        >
+          <div className="mb-6 flex items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground">
+              <Lock className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="font-display text-2xl text-primary leading-none">SAM GUCHI</h1>
+              <p className="text-xs text-muted-foreground">Panel Admin</p>
+            </div>
+          </div>
+          <label className="text-sm font-medium">Contraseña</label>
+          <input
+            type="password"
+            value={pwd}
+            onChange={(e) => { setPwd(e.target.value); setError(false); }}
+            autoFocus
+            className="mt-2 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+            placeholder="••••••••"
+          />
+          {error && <p className="mt-2 text-xs text-destructive">Contraseña incorrecta</p>}
+          <button className="mt-4 w-full rounded-md bg-primary py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">
+            Ingresar
+          </button>
+          <Link to="/" className="mt-4 flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-primary">
+            <ArrowLeft className="h-3 w-3" /> Volver al inicio
+          </Link>
+        </form>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex bg-[oklch(0.96_0.02_75)]">
+      {/* Sidebar */}
+      <aside className="w-60 shrink-0 bg-[#1a1a1a] text-white flex flex-col">
+        <div className="px-6 py-6 border-b border-white/10">
+          <h1 className="font-display text-2xl text-[oklch(0.78_0.17_75)] leading-none">SAM GUCHI</h1>
+          <p className="text-xs text-white/60 mt-1">Panel Admin</p>
+        </div>
+        <nav className="flex-1 p-3 space-y-1">
+          <NavBtn icon={LayoutGrid} label="Pedidos" active={section === "pedidos"} onClick={() => setSection("pedidos")} />
+          <NavBtn icon={Package} label="Catálogo" active={section === "catalogo"} onClick={() => setSection("catalogo")} />
+          <NavBtn icon={BarChart3} label="Reportes" active={section === "reportes"} onClick={() => setSection("reportes")} />
+        </nav>
+        <div className="p-3 border-t border-white/10">
+          <button
+            onClick={() => setAuthed(false)}
+            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white"
+          >
+            <LogOut className="h-4 w-4" /> Cerrar sesión
+          </button>
+        </div>
+      </aside>
+
+      {/* Main */}
+      <main className="flex-1 overflow-x-auto px-10 py-8">
+        {section === "pedidos" && <PedidosView />}
+        {section === "catalogo" && <CatalogoView />}
+        {section === "reportes" && <ReportesView />}
+      </main>
+    </div>
+  );
+}
+
+function NavBtn({ icon: Icon, label, active, onClick }: { icon: typeof LayoutGrid; label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition ${
+        active ? "bg-primary text-primary-foreground" : "text-white/70 hover:bg-white/5 hover:text-white"
+      }`}
+    >
+      <Icon className="h-4 w-4" /> {label}
+    </button>
+  );
+}
+
+/* ---------- Pedidos ---------- */
+function PedidosView() {
+  const realOrders = useOrders();
+  const [demoStates, setDemoStates] = useState<Record<string, Order["estado"]>>(
+    () => Object.fromEntries(DEMO_ORDERS.map((o) => [o.id, o.estado])),
   );
 
-  const stats = useMemo(() => {
-    const total = orders.reduce((s, o) => s + o.total, 0);
-    const finalizados = orders.filter((o) => o.estado === "Finalizado").length;
-    const nuevos = orders.filter((o) => o.estado === "Nuevo").length;
-    return { total, finalizados, nuevos, count: orders.length };
-  }, [orders]);
+  const demoList = DEMO_ORDERS.map((o) => ({ ...o, estado: demoStates[o.id] }));
+  const counts = useMemo(() => {
+    const all = [
+      ...demoList.map((d) => d.estado),
+      ...realOrders.map((r) => r.estado),
+    ];
+    return {
+      Nuevo: all.filter((e) => e === "Nuevo").length,
+      "En Preparación": all.filter((e) => e === "En Preparación").length,
+      Despachado: all.filter((e) => e === "Despachado").length,
+      Finalizado: all.filter((e) => e === "Finalizado").length,
+    };
+  }, [demoList, realOrders]);
 
-  const exportExcel = () => {
-    if (orders.length === 0) return toast.error("No hay ventas para exportar");
-    const rows = orders.flatMap((o) =>
-      o.items.map((i) => ({
-        "N° Pedido": o.id,
-        Fecha: new Date(o.fecha).toLocaleString("es-AR"),
-        Cliente: o.cliente,
-        Estado: o.estado,
-        Producto: i.nombre,
-        Cantidad: i.cantidad,
-        "Precio Unit.": i.precio,
-        Subtotal: i.precio * i.cantidad,
-        "Total Pedido": o.total,
-      })),
-    );
-    const wb = XLSX.utils.book_new();
-    const wsDetalle = XLSX.utils.json_to_sheet(rows);
-    wsDetalle["!cols"] = [{ wch: 16 }, { wch: 20 }, { wch: 18 }, { wch: 16 }, { wch: 28 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 14 }];
-    XLSX.utils.book_append_sheet(wb, wsDetalle, "Ventas");
-
-    const resumen = orders.map((o) => ({
-      "N° Pedido": o.id,
-      Fecha: new Date(o.fecha).toLocaleString("es-AR"),
-      Cliente: o.cliente,
-      Estado: o.estado,
-      Ítems: o.items.reduce((s, i) => s + i.cantidad, 0),
-      Total: o.total,
-    }));
-    const wsResumen = XLSX.utils.json_to_sheet(resumen);
-    wsResumen["!cols"] = [{ wch: 16 }, { wch: 20 }, { wch: 18 }, { wch: 16 }, { wch: 8 }, { wch: 14 }];
-    XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen");
-
-    const fecha = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `sam-guchi-ventas-${fecha}.xlsx`);
-    toast.success("Excel generado");
+  const advanceDemo = (id: string) => {
+    setDemoStates((s) => {
+      const next = NEXT_STATE[s[id]];
+      if (!next) return s;
+      return { ...s, [id]: next };
+    });
+    toast.success("Estado actualizado");
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <div className="flex items-center gap-3">
-            <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
-              <ArrowLeft className="h-4 w-4" /> Volver
-            </Link>
-            <span className="h-6 w-px bg-border" />
-            <h1 className="font-display text-2xl text-primary">Panel Sam Guchi</h1>
+    <div>
+      <h1 className="font-display text-4xl mb-6 text-foreground">DASHBOARD DE PEDIDOS</h1>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {(Object.keys(counts) as Order["estado"][]).map((e) => (
+          <div key={e} className="rounded-2xl bg-card p-5 border border-border">
+            <span className={`inline-block rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[e]}`}>{e}</span>
+            <p className="mt-4 font-display text-4xl">{counts[e]}</p>
+            <p className="text-xs text-muted-foreground">pedidos</p>
           </div>
-          <button
-            onClick={exportExcel}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-warm hover:opacity-90"
+        ))}
+      </div>
+
+      <div className="space-y-4">
+        {demoList.map((o) => {
+          const next = NEXT_STATE[o.estado];
+          return (
+            <div key={o.id} className="rounded-2xl bg-card border border-border p-5">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-3 mb-3">
+                    <span className="font-display text-2xl">{o.id}</span>
+                    <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[o.estado]}`}>{o.estado}</span>
+                    <span className="flex items-center gap-1 text-sm text-muted-foreground"><User className="h-3.5 w-3.5" />{o.cliente}</span>
+                  </div>
+                  <ul className="text-sm text-muted-foreground space-y-0.5">
+                    {o.items.map((i, idx) => <li key={idx}>{i.cant}× {i.nombre}</li>)}
+                  </ul>
+                  <p className="mt-3 font-display text-2xl text-primary">{formatARS(o.total)}</p>
+                </div>
+                <div className="flex flex-col items-end gap-3">
+                  <span className="text-sm text-muted-foreground">{o.hora}</span>
+                  {next && (
+                    <button
+                      onClick={() => advanceDemo(o.id)}
+                      className="inline-flex items-center gap-1 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+                    >
+                      <ChevronRight className="h-4 w-4" /> {next}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {realOrders.length > 0 && (
+          <>
+            <h2 className="font-display text-2xl mt-8 mb-2">Pedidos reales</h2>
+            {realOrders.map((o) => (
+              <div key={o.id} className="rounded-2xl bg-card border border-border p-5">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-3 mb-3">
+                      <span className="font-mono text-sm">{o.id}</span>
+                      <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[o.estado]}`}>{o.estado}</span>
+                      <span className="flex items-center gap-1 text-sm text-muted-foreground"><User className="h-3.5 w-3.5" />{o.cliente}</span>
+                    </div>
+                    <ul className="text-sm text-muted-foreground">
+                      {o.items.map((i) => <li key={i.id}>{i.cantidad}× {i.nombre}</li>)}
+                    </ul>
+                    <p className="mt-3 font-display text-2xl text-primary">{formatARS(o.total)}</p>
+                  </div>
+                  <select
+                    value={o.estado}
+                    onChange={(e) => updateOrderState(o.id, e.target.value as Order["estado"])}
+                    className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    {(["Nuevo", "En Preparación", "Despachado", "Finalizado"] as const).map((s) =>
+                      <option key={s} value={s}>{s}</option>
+                    )}
+                  </select>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Catálogo ---------- */
+type CatItem = { id: string; nombre: string; categoria: string; precio: number; disponible: boolean; imagen: string };
+
+function CatalogoView() {
+  const initial: CatItem[] = PRODUCTS.map((p: Product) => ({
+    id: p.id, nombre: p.nombre, categoria: p.categoria, precio: p.precio, disponible: true, imagen: p.imagen,
+  }));
+  const [items, setItems] = useState<CatItem[]>(initial);
+  const [editing, setEditing] = useState<CatItem | null>(null);
+
+  const toggle = (id: string) =>
+    setItems((xs) => xs.map((x) => x.id === id ? { ...x, disponible: !x.disponible } : x));
+
+  const save = (updated: CatItem) => {
+    setItems((xs) => xs.map((x) => x.id === updated.id ? updated : x));
+    setEditing(null);
+    toast.success("Producto actualizado");
+  };
+
+  return (
+    <div>
+      <h1 className="font-display text-4xl mb-6 text-foreground">GESTIÓN DE CATÁLOGO</h1>
+
+      <div className="rounded-2xl bg-card border border-border overflow-hidden">
+        <div className="grid grid-cols-[2fr_1fr_1fr_1fr_60px] px-6 py-4 border-b border-border text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <div>Producto</div><div>Categoría</div><div>Precio</div><div>Disponible</div><div />
+        </div>
+        {items.map((it) => (
+          <div
+            key={it.id}
+            className={`grid grid-cols-[2fr_1fr_1fr_1fr_60px] items-center px-6 py-3 border-b border-border/60 last:border-0 ${!it.disponible ? "opacity-50" : ""}`}
           >
-            <Download className="h-4 w-4" /> Exportar a Excel
-          </button>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {[
-            { label: "Pedidos", value: stats.count },
-            { label: "Nuevos", value: stats.nuevos },
-            { label: "Finalizados", value: stats.finalizados },
-            { label: "Ventas totales", value: formatARS(stats.total) },
-          ].map((s) => (
-            <div key={s.label} className="rounded-2xl border border-border bg-card p-5">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">{s.label}</p>
-              <p className="mt-2 font-display text-3xl">{s.value}</p>
+            <div className="flex items-center gap-3">
+              <img src={it.imagen} alt={it.nombre} className="h-11 w-11 rounded-full object-cover" />
+              <span className="font-medium">{it.nombre}</span>
             </div>
-          ))}
-        </div>
-
-        <div className="mt-8 flex flex-wrap gap-2">
-          {(["Todos", ...ESTADOS] as const).map((e) => (
+            <div className="text-sm text-muted-foreground">{it.categoria}</div>
+            <div className="font-display text-xl text-primary">{formatARS(it.precio)}</div>
+            <div>
+              <button
+                onClick={() => toggle(it.id)}
+                className={`inline-flex items-center rounded-full border px-4 py-1 text-xs font-bold uppercase transition ${
+                  it.disponible
+                    ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                    : "border-red-300 bg-red-50 text-red-700"
+                }`}
+              >
+                {it.disponible ? "Sí" : "No"}
+              </button>
+            </div>
             <button
-              key={e}
-              onClick={() => setFiltro(e)}
-              className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-                filtro === e ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary/50"
-              }`}
+              onClick={() => setEditing(it)}
+              className="justify-self-end grid h-9 w-9 place-items-center rounded-full hover:bg-muted"
+              aria-label="Editar"
             >
-              {e}
+              <Pencil className="h-4 w-4" />
             </button>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
-          {shown.length === 0 ? (
-            <div className="p-10 text-center text-muted-foreground">
-              Todavía no hay pedidos. Realizá un pedido desde la home para verlo acá.
+      {editing && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4" onClick={() => setEditing(null)}>
+          <div className="w-full max-w-md rounded-2xl bg-card p-6 border border-border" onClick={(e) => e.stopPropagation()}>
+            <h2 className="font-display text-2xl mb-4">Editar producto</h2>
+            <label className="text-sm font-medium">Nombre</label>
+            <input
+              className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              value={editing.nombre}
+              onChange={(e) => setEditing({ ...editing, nombre: e.target.value })}
+            />
+            <label className="mt-3 block text-sm font-medium">Categoría</label>
+            <input
+              className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              value={editing.categoria}
+              onChange={(e) => setEditing({ ...editing, categoria: e.target.value })}
+            />
+            <label className="mt-3 block text-sm font-medium">Precio</label>
+            <input
+              type="number"
+              className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              value={editing.precio}
+              onChange={(e) => setEditing({ ...editing, precio: Number(e.target.value) })}
+            />
+            <label className="mt-3 flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={editing.disponible}
+                onChange={(e) => setEditing({ ...editing, disponible: e.target.checked })}
+              />
+              Disponible
+            </label>
+            <div className="mt-6 flex justify-end gap-2">
+              <button onClick={() => setEditing(null)} className="rounded-md border border-input px-4 py-2 text-sm hover:bg-muted">Cancelar</button>
+              <button onClick={() => save(editing)} className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">Guardar</button>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-secondary/60 text-left">
-                  <tr>
-                    <th className="px-4 py-3 font-semibold">Pedido</th>
-                    <th className="px-4 py-3 font-semibold">Fecha</th>
-                    <th className="px-4 py-3 font-semibold">Cliente</th>
-                    <th className="px-4 py-3 font-semibold">Detalle</th>
-                    <th className="px-4 py-3 font-semibold">Total</th>
-                    <th className="px-4 py-3 font-semibold">Estado</th>
-                    <th className="px-4 py-3" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {shown.map((o) => (
-                    <tr key={o.id} className="border-t border-border align-top">
-                      <td className="px-4 py-3 font-mono text-xs">{o.id}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{new Date(o.fecha).toLocaleString("es-AR")}</td>
-                      <td className="px-4 py-3 font-medium">{o.cliente}</td>
-                      <td className="px-4 py-3">
-                        <ul className="space-y-0.5 text-xs text-muted-foreground">
-                          {o.items.map((i) => (
-                            <li key={i.id}>{i.cantidad}× {i.nombre}</li>
-                          ))}
-                        </ul>
-                      </td>
-                      <td className="px-4 py-3 font-semibold text-primary">{formatARS(o.total)}</td>
-                      <td className="px-4 py-3">
-                        <select
-                          value={o.estado}
-                          onChange={(e) => updateOrderState(o.id, e.target.value as Order["estado"])}
-                          className="rounded-md border border-input bg-background px-2 py-1 text-xs"
-                        >
-                          {ESTADOS.map((s) => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => { deleteOrder(o.id); toast.success("Pedido eliminado"); }}
-                          className="text-destructive hover:opacity-70"
-                          aria-label="Eliminar"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          </div>
         </div>
-      </main>
+      )}
+    </div>
+  );
+}
+
+/* ---------- Reportes ---------- */
+function ReportesView() {
+  const topProducts = [
+    { nombre: "Hamburguesa Clásica", uds: 3, total: 12600 },
+    { nombre: "Coca-Cola 500ml", uds: 3, total: 3600 },
+    { nombre: "Milanesa Completa", uds: 1, total: 4500 },
+    { nombre: "Jugo Natural", uds: 1, total: 1500 },
+  ];
+  const maxTotal = Math.max(...topProducts.map((t) => t.total));
+
+  const exportExcel = () => {
+    const rows = [
+      { Métrica: "Ingresos del día", Valor: 22200 },
+      { Métrica: "Pedidos activos", Valor: 3 },
+      { Métrica: "Productos activos", Valor: 12 },
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "Resumen");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(topProducts), "Top Productos");
+    XLSX.writeFile(wb, `sam-guchi-reporte-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    toast.success("Reporte exportado");
+  };
+
+  return (
+    <div>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <h1 className="font-display text-4xl text-foreground">REPORTES DE VENTA</h1>
+        <button
+          onClick={exportExcel}
+          className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-warm hover:opacity-90"
+        >
+          <Download className="h-4 w-4" /> Exportar a Excel
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <StatCard icon={<DollarSign className="h-5 w-5 text-emerald-600" />} bg="bg-emerald-50" label="Ingresos del día" value="$22.200" />
+        <StatCard icon={<LayoutGrid className="h-5 w-5 text-blue-600" />} bg="bg-blue-50" label="Pedidos activos" value="3" />
+        <StatCard icon={<Package className="h-5 w-5 text-purple-600" />} bg="bg-purple-50" label="Productos activos" value="12" />
+      </div>
+
+      <div className="rounded-2xl bg-card border border-border p-6">
+        <h2 className="font-display text-2xl mb-5">PRODUCTOS MÁS PEDIDOS</h2>
+        <ol className="space-y-4">
+          {topProducts.map((p, i) => (
+            <li key={p.nombre} className="flex items-center gap-4">
+              <span className="font-display text-2xl text-muted-foreground w-6">{i + 1}</span>
+              <div className="flex-1">
+                <div className="flex items-baseline justify-between mb-1">
+                  <span className="font-semibold">{p.nombre}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {p.uds} uds. <span className="ml-3 font-display text-lg text-primary">{formatARS(p.total)}</span>
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-muted overflow-hidden">
+                  <div className="h-full bg-primary" style={{ width: `${(p.total / maxTotal) * 100}%` }} />
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ icon, bg, label, value }: { icon: React.ReactNode; bg: string; label: string; value: string }) {
+  return (
+    <div className="rounded-2xl bg-card border border-border p-5">
+      <div className={`grid h-11 w-11 place-items-center rounded-xl ${bg}`}>{icon}</div>
+      <p className="mt-4 text-sm text-muted-foreground">{label}</p>
+      <p className="font-display text-4xl mt-1">{value}</p>
     </div>
   );
 }
