@@ -20,16 +20,22 @@ const KEY = "samguchi_orders_v1";
 
 const listeners = new Set<() => void>();
 
+const EMPTY: Order[] = [];
+let cache: Order[] | null = null;
+
 function read(): Order[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return EMPTY;
+  if (cache) return cache;
   try {
-    return JSON.parse(localStorage.getItem(KEY) || "[]");
+    cache = JSON.parse(localStorage.getItem(KEY) || "[]");
   } catch {
-    return [];
+    cache = [];
   }
+  return cache!;
 }
 
 function write(orders: Order[]) {
+  cache = orders;
   localStorage.setItem(KEY, JSON.stringify(orders));
   listeners.forEach((l) => l());
 }
@@ -41,7 +47,7 @@ export function useOrders(): Order[] {
       return () => listeners.delete(cb);
     },
     read,
-    () => [],
+    () => EMPTY,
   );
 }
 
