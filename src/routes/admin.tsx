@@ -400,17 +400,23 @@ function ReportesView() {
   const maxTotal = Math.max(...topProducts.map((t) => t.total));
 
   const exportExcel = () => {
-    const rows = [
-      { Métrica: "Ingresos del día", Valor: 22200 },
-      { Métrica: "Pedidos activos", Valor: 3 },
-      { Métrica: "Productos activos", Valor: 12 },
+    const resumen = [
+      { "Métrica": "Ingresos del día", "Valor ($)": 22200 },
+      { "Métrica": "Pedidos activos", "Valor ($)": 3 },
+      { "Métrica": "Productos activos", "Valor ($)": 12 },
     ];
+    const productos = topProducts.map((p) => ({
+      "Nombre del Item": p.nombre,
+      "Unidades": p.uds,
+      "Total ($)": p.total,
+    }));
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "Resumen");
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(topProducts), "Top Productos");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumen), "Resumen");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productos), "Top Productos");
     XLSX.writeFile(wb, `sam-guchi-reporte-${new Date().toISOString().slice(0, 10)}.xlsx`);
     toast.success("Reporte exportado");
   };
+
 
   return (
     <div>
