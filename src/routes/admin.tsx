@@ -53,19 +53,46 @@ const ESTADO_STYLES: Record<Order["estado"], string> = {
 };
 
 function Admin() {
-  const [authed, setAuthed] = useState(false);
+  const check = useServerFn(checkAdminSession);
+  const unlock = useServerFn(unlockAdmin);
+  const lock = useServerFn(lockAdmin);
+  const [authed, setAuthed] = useState<boolean | null>(null);
   const [pwd, setPwd] = useState("");
   const [error, setError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [section, setSection] = useState<Section>("pedidos");
+
+  useEffect(() => {
+    check().then((r) => setAuthed(r.unlocked)).catch(() => setAuthed(false));
+  }, [check]);
+
+  const handleLogout = async () => {
+    try { await lock(); } catch { /* ignore */ }
+    setAuthed(false);
+    setPwd("");
+  };
+
+  if (authed === null) {
+    return <div className="min-h-screen grid place-items-center bg-background text-sm text-muted-foreground">Cargando…</div>;
+  }
 
   if (!authed) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <form
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            if (pwd === PASSWORD) { setAuthed(true); setError(false); }
-            else setError(true);
+            if (submitting) return;
+            setSubmitting(true);
+            try {
+              const res = await unlock({ data: { password: pwd } });
+              if (res.ok) { setAuthed(true); setError(false); setPwd(""); }
+              else setError(true);
+            } catch {
+              setError(true);
+            } finally {
+              setSubmitting(false);
+            }
           }}
           className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-warm"
         >
@@ -88,8 +115,8 @@ function Admin() {
             placeholder="••••••••"
           />
           {error && <p className="mt-2 text-xs text-destructive">Contraseña incorrecta</p>}
-          <button className="mt-4 w-full rounded-md bg-primary py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">
-            Ingresar
+          <button disabled={submitting} className="mt-4 w-full rounded-md bg-primary py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60">
+            {submitting ? "Verificando…" : "Ingresar"}
           </button>
           <Link to="/" className="mt-4 flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-primary">
             <ArrowLeft className="h-3 w-3" /> Volver al inicio
@@ -99,38 +126,6 @@ function Admin() {
     );
   }
 
-  return (
-    <div className="min-h-screen flex bg-[oklch(0.96_0.02_75)]">
-      {/* Sidebar */}
-      <aside className="w-60 shrink-0 bg-[#1a1a1a] text-white flex flex-col">
-        <div className="px-6 py-6 border-b border-white/10">
-          <h1 className="font-display text-2xl text-[oklch(0.78_0.17_75)] leading-none">SAM GUCHI</h1>
-          <p className="text-xs text-white/60 mt-1">Panel Admin</p>
-        </div>
-        <nav className="flex-1 p-3 space-y-1">
-          <NavBtn icon={LayoutGrid} label="Pedidos" active={section === "pedidos"} onClick={() => setSection("pedidos")} />
-          <NavBtn icon={Package} label="Catálogo" active={section === "catalogo"} onClick={() => setSection("catalogo")} />
-          <NavBtn icon={BarChart3} label="Reportes" active={section === "reportes"} onClick={() => setSection("reportes")} />
-        </nav>
-        <div className="p-3 border-t border-white/10">
-          <button
-            onClick={() => setAuthed(false)}
-            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white"
-          >
-            <LogOut className="h-4 w-4" /> Cerrar sesión
-          </button>
-        </div>
-      </aside>
-
-      {/* Main */}
-      <main className="flex-1 overflow-x-auto px-10 py-8">
-        {section === "pedidos" && <PedidosView />}
-        {section === "catalogo" && <CatalogoView />}
-        {section === "reportes" && <ReportesView />}
-      </main>
-    </div>
-  );
-}
 
 function NavBtn({ icon: Icon, label, active, onClick }: { icon: typeof LayoutGrid; label: string; active: boolean; onClick: () => void }) {
   return (
