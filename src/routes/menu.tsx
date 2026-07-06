@@ -47,6 +47,11 @@ function Menu() {
   const add = (id: string) => { setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 })); toast.success("Agregado al pedido"); };
   const dec = (id: string) => setCart((c) => ({ ...c, [id]: Math.max(0, (c[id] || 0) - 1) }));
   const remove = (id: string) => setCart((c) => ({ ...c, [id]: 0 }));
+  const clearCart = () => {
+    if (items.length === 0) return;
+    setCart({});
+    toast.info("Pedido vaciado");
+  };
 
   const enviarPedido = () => {
     if (items.length === 0) return toast.error("Tu pedido está vacío");
@@ -78,8 +83,8 @@ function Menu() {
             <ShoppingBag className="h-4 w-4" />
             <span className="hidden sm:inline">Pedido</span>
             {count > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-xs font-bold text-accent-foreground">
-                {count}
+              <span className="ml-1 inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/15 px-2 py-0.5 text-xs font-bold">
+                {count} · {formatARS(total)}
               </span>
             )}
           </button>
@@ -146,7 +151,17 @@ function Menu() {
           <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-card shadow-2xl">
             <div className="flex items-center justify-between border-b border-border p-4">
               <h3 className="font-display text-2xl">Tu pedido</h3>
-              <button onClick={() => setCartOpen(false)} className="text-sm text-muted-foreground hover:text-foreground">Cerrar</button>
+              <div className="flex items-center gap-2">
+                {items.length > 0 && (
+                  <button
+                    onClick={clearCart}
+                    className="inline-flex items-center gap-1 text-sm text-destructive hover:opacity-80"
+                  >
+                    <Trash2 className="h-4 w-4" /> Vaciar
+                  </button>
+                )}
+                <button onClick={() => setCartOpen(false)} className="text-sm text-muted-foreground hover:text-foreground">Cerrar</button>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto p-4">
               {items.length === 0 ? (
