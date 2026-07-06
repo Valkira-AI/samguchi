@@ -240,13 +240,13 @@ function PedidosView() {
 
   return (
     <div>
-      <h1 className="font-display text-4xl mb-6 text-foreground">DASHBOARD DE PEDIDOS</h1>
+      <h1 className="font-display text-2xl md:text-4xl mb-6 text-foreground">DASHBOARD DE PEDIDOS</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {(Object.keys(counts) as Order["estado"][]).map((e) => (
           <div key={e} className="rounded-2xl bg-card p-5 border border-border">
             <span className={`inline-block rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[e]}`}>{e}</span>
-            <p className="mt-4 font-display text-4xl">{counts[e]}</p>
+            <p className="mt-4 font-display text-2xl md:text-4xl">{counts[e]}</p>
             <p className="text-xs text-muted-foreground">pedidos</p>
           </div>
         ))}
@@ -460,7 +460,7 @@ function ReportesView() {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <h1 className="font-display text-4xl text-foreground">REPORTES DE VENTA</h1>
+        <h1 className="font-display text-2xl md:text-4xl text-foreground">REPORTES DE VENTA</h1>
         <button
           onClick={exportExcel}
           className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-warm hover:opacity-90"
@@ -505,7 +505,7 @@ function StatCard({ icon, bg, label, value }: { icon: React.ReactNode; bg: strin
     <div className="rounded-2xl bg-card border border-border p-5">
       <div className={`grid h-11 w-11 place-items-center rounded-xl ${bg}`}>{icon}</div>
       <p className="mt-4 text-sm text-muted-foreground">{label}</p>
-      <p className="font-display text-4xl mt-1">{value}</p>
+      <p className="font-display text-2xl md:text-4xl mt-1">{value}</p>
     </div>
   );
 }
