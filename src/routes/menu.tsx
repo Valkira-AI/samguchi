@@ -151,7 +151,17 @@ function Menu() {
           <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-card shadow-2xl">
             <div className="flex items-center justify-between border-b border-border p-4">
               <h3 className="font-display text-2xl">Tu pedido</h3>
-              <button onClick={() => setCartOpen(false)} className="text-sm text-muted-foreground hover:text-foreground">Cerrar</button>
+              <div className="flex items-center gap-2">
+                {items.length > 0 && (
+                  <button
+                    onClick={clearCart}
+                    className="inline-flex items-center gap-1 text-sm text-destructive hover:opacity-80"
+                  >
+                    <Trash2 className="h-4 w-4" /> Vaciar
+                  </button>
+                )}
+                <button onClick={() => setCartOpen(false)} className="text-sm text-muted-foreground hover:text-foreground">Cerrar</button>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto p-4">
               {items.length === 0 ? (
