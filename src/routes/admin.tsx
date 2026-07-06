@@ -127,8 +127,30 @@ function Admin() {
   }
 
   return (
-    <div className="min-h-screen flex bg-[oklch(0.96_0.02_75)]">
-      <aside className="w-60 shrink-0 bg-[#1a1a1a] text-white flex flex-col">
+    <div className="min-h-screen md:flex bg-[oklch(0.96_0.02_75)]">
+      {/* Mobile top bar */}
+      <div className="md:hidden bg-[#1a1a1a] text-white sticky top-0 z-40">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+          <div>
+            <h1 className="font-display text-xl text-[oklch(0.78_0.17_75)] leading-none">SAM GUCHI</h1>
+            <p className="text-[10px] text-white/60 mt-0.5">Panel Admin</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-white/70 hover:bg-white/5 hover:text-white"
+          >
+            <LogOut className="h-4 w-4" /> Salir
+          </button>
+        </div>
+        <nav className="flex px-2 py-2 gap-1 overflow-x-auto">
+          <MobileNavBtn icon={LayoutGrid} label="Pedidos" active={section === "pedidos"} onClick={() => setSection("pedidos")} />
+          <MobileNavBtn icon={Package} label="Catálogo" active={section === "catalogo"} onClick={() => setSection("catalogo")} />
+          <MobileNavBtn icon={BarChart3} label="Reportes" active={section === "reportes"} onClick={() => setSection("reportes")} />
+        </nav>
+      </div>
+
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex w-60 shrink-0 bg-[#1a1a1a] text-white flex-col">
         <div className="px-6 py-6 border-b border-white/10">
           <h1 className="font-display text-2xl text-[oklch(0.78_0.17_75)] leading-none">SAM GUCHI</h1>
           <p className="text-xs text-white/60 mt-1">Panel Admin</p>
@@ -148,12 +170,25 @@ function Admin() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-x-auto px-10 py-8">
+      <main className="flex-1 min-w-0 px-4 py-6 md:px-10 md:py-8">
         {section === "pedidos" && <PedidosView />}
         {section === "catalogo" && <CatalogoView />}
         {section === "reportes" && <ReportesView />}
       </main>
     </div>
+  );
+}
+
+function MobileNavBtn({ icon: Icon, label, active, onClick }: { icon: typeof LayoutGrid; label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition ${
+        active ? "bg-primary text-primary-foreground" : "text-white/70 hover:bg-white/5"
+      }`}
+    >
+      <Icon className="h-3.5 w-3.5" /> {label}
+    </button>
   );
 }
 
@@ -205,13 +240,13 @@ function PedidosView() {
 
   return (
     <div>
-      <h1 className="font-display text-4xl mb-6 text-foreground">DASHBOARD DE PEDIDOS</h1>
+      <h1 className="font-display text-2xl md:text-4xl mb-6 text-foreground">DASHBOARD DE PEDIDOS</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {(Object.keys(counts) as Order["estado"][]).map((e) => (
           <div key={e} className="rounded-2xl bg-card p-5 border border-border">
             <span className={`inline-block rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[e]}`}>{e}</span>
-            <p className="mt-4 font-display text-4xl">{counts[e]}</p>
+            <p className="mt-4 font-display text-2xl md:text-4xl">{counts[e]}</p>
             <p className="text-xs text-muted-foreground">pedidos</p>
           </div>
         ))}
@@ -307,24 +342,27 @@ function CatalogoView() {
 
   return (
     <div>
-      <h1 className="font-display text-4xl mb-6 text-foreground">GESTIÓN DE CATÁLOGO</h1>
+      <h1 className="font-display text-2xl md:text-4xl mb-6 text-foreground">GESTIÓN DE CATÁLOGO</h1>
 
       <div className="rounded-2xl bg-card border border-border overflow-hidden">
-        <div className="grid grid-cols-[2fr_1fr_1fr_1fr_60px] px-6 py-4 border-b border-border text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_60px] px-6 py-4 border-b border-border text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           <div>Producto</div><div>Categoría</div><div>Precio</div><div>Disponible</div><div />
         </div>
         {items.map((it) => (
           <div
             key={it.id}
-            className={`grid grid-cols-[2fr_1fr_1fr_1fr_60px] items-center px-6 py-3 border-b border-border/60 last:border-0 ${!it.disponible ? "opacity-50" : ""}`}
+            className={`flex flex-col gap-3 md:grid md:grid-cols-[2fr_1fr_1fr_1fr_60px] md:items-center px-4 md:px-6 py-3 border-b border-border/60 last:border-0 ${!it.disponible ? "opacity-50" : ""}`}
           >
-            <div className="flex items-center gap-3">
-              <img src={it.imagen} alt={it.nombre} className="h-11 w-11 rounded-full object-cover" />
-              <span className="font-medium">{it.nombre}</span>
+            <div className="flex items-center gap-3 min-w-0">
+              <img src={it.imagen} alt={it.nombre} className="h-11 w-11 shrink-0 rounded-full object-cover" />
+              <span className="font-medium truncate">{it.nombre}</span>
             </div>
-            <div className="text-sm text-muted-foreground">{it.categoria}</div>
+            <div className="text-sm text-muted-foreground md:block">
+              <span className="md:hidden text-xs uppercase tracking-wide mr-2">Categoría:</span>{it.categoria}
+            </div>
             <div className="font-display text-xl text-primary">{formatARS(it.precio)}</div>
-            <div>
+            <div className="flex items-center justify-between md:block">
+              <span className="md:hidden text-xs uppercase tracking-wide text-muted-foreground">Disponible</span>
               <button
                 onClick={() => toggle(it.id)}
                 className={`inline-flex items-center rounded-full border px-4 py-1 text-xs font-bold uppercase transition ${
@@ -338,7 +376,7 @@ function CatalogoView() {
             </div>
             <button
               onClick={() => setEditing(it)}
-              className="justify-self-end grid h-9 w-9 place-items-center rounded-full hover:bg-muted"
+              className="self-end md:self-auto md:justify-self-end grid h-9 w-9 place-items-center rounded-full hover:bg-muted"
               aria-label="Editar"
             >
               <Pencil className="h-4 w-4" />
@@ -346,6 +384,7 @@ function CatalogoView() {
           </div>
         ))}
       </div>
+
 
       {editing && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4" onClick={() => setEditing(null)}>
@@ -421,7 +460,7 @@ function ReportesView() {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <h1 className="font-display text-4xl text-foreground">REPORTES DE VENTA</h1>
+        <h1 className="font-display text-2xl md:text-4xl text-foreground">REPORTES DE VENTA</h1>
         <button
           onClick={exportExcel}
           className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-warm hover:opacity-90"
@@ -466,7 +505,7 @@ function StatCard({ icon, bg, label, value }: { icon: React.ReactNode; bg: strin
     <div className="rounded-2xl bg-card border border-border p-5">
       <div className={`grid h-11 w-11 place-items-center rounded-xl ${bg}`}>{icon}</div>
       <p className="mt-4 text-sm text-muted-foreground">{label}</p>
-      <p className="font-display text-4xl mt-1">{value}</p>
+      <p className="font-display text-2xl md:text-4xl mt-1">{value}</p>
     </div>
   );
 }
