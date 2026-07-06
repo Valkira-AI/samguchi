@@ -47,6 +47,11 @@ function Menu() {
   const add = (id: string) => { setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 })); toast.success("Agregado al pedido"); };
   const dec = (id: string) => setCart((c) => ({ ...c, [id]: Math.max(0, (c[id] || 0) - 1) }));
   const remove = (id: string) => setCart((c) => ({ ...c, [id]: 0 }));
+  const clearCart = () => {
+    if (items.length === 0) return;
+    setCart({});
+    toast.info("Pedido vaciado");
+  };
 
   const enviarPedido = () => {
     if (items.length === 0) return toast.error("Tu pedido está vacío");
