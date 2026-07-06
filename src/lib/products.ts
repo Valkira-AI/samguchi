@@ -19,14 +19,14 @@ export type Product = {
 };
 
 export const PRODUCTS: Product[] = [
-  { id: "p1", nombre: "Sándwich de Milanesa", descripcion: "Milanesa de ternera, lechuga, tomate y mayo casera en pan crujiente.", precio: 4500, categoria: "Sándwiches", imagen: milanesa },
-  { id: "p2", nombre: "Lomito Completo", descripcion: "Lomo, jamón, queso, huevo, lechuga y tomate en pan artesanal.", precio: 6200, categoria: "Sándwiches", imagen: lomito },
-  { id: "p3", nombre: "Choripán con Chimichurri", descripcion: "Chorizo parrillero, chimichurri fresco y pan crocante.", precio: 3800, categoria: "Sándwiches", imagen: choripan },
-  { id: "p4", nombre: "Hamburguesa Completa", descripcion: "Doble medallón, cheddar, panceta, huevo y verdeo.", precio: 5500, categoria: "Sándwiches", imagen: hamburguesa },
-  { id: "p5", nombre: "Pebete Jamón y Queso", descripcion: "Clásico pebete tierno con jamón cocido y queso derretido.", precio: 3200, categoria: "Sándwiches", imagen: pebete },
-  { id: "p6", nombre: "Cerveza Artesanal", descripcion: "Rubia bien fría, estilo lager argentina.", precio: 2500, categoria: "Bebidas", imagen: cerveza },
-  { id: "p7", nombre: "Gaseosa Línea Cola", descripcion: "Botella 500ml bien helada.", precio: 1800, categoria: "Bebidas", imagen: gaseosa },
-  { id: "p8", nombre: "Combo Picada Jujeña", descripcion: "Milanesa + papas + bebida. Ideal para compartir.", precio: 8900, categoria: "Promos", imagen: promo },
+  { id: "p1", nombre: "Sándwich de Milanesa", descripcion: "Milanesa de ternera, lechuga, tomate y mayo casera en pan crujiente.", precio: 5200, categoria: "Sándwiches", imagen: milanesa },
+  { id: "p2", nombre: "Lomito Completo", descripcion: "Lomo, jamón, queso, huevo, lechuga y tomate en pan artesanal.", precio: 7200, categoria: "Sándwiches", imagen: lomito },
+  { id: "p3", nombre: "Choripán con Chimichurri", descripcion: "Chorizo parrillero, chimichurri fresco y pan crocante.", precio: 4400, categoria: "Sándwiches", imagen: choripan },
+  { id: "p4", nombre: "Hamburguesa Completa", descripcion: "Doble medallón, cheddar, panceta, huevo y verdeo.", precio: 6400, categoria: "Sándwiches", imagen: hamburguesa },
+  { id: "p5", nombre: "Pebete Jamón y Queso", descripcion: "Clásico pebete tierno con jamón cocido y queso derretido.", precio: 3700, categoria: "Sándwiches", imagen: pebete },
+  { id: "p6", nombre: "Cerveza Artesanal", descripcion: "Rubia bien fría, estilo lager argentina.", precio: 2900, categoria: "Bebidas", imagen: cerveza },
+  { id: "p7", nombre: "Gaseosa Línea Cola", descripcion: "Botella 500ml bien helada.", precio: 2100, categoria: "Bebidas", imagen: gaseosa },
+  { id: "p8", nombre: "Combo Picada Jujeña", descripcion: "Milanesa + papas + bebida. Ideal para compartir.", precio: 10300, categoria: "Promos", imagen: promo },
 ];
 
 export const CATEGORIES: Category[] = ["Sándwiches", "Bebidas", "Promos"];

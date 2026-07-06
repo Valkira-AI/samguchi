@@ -8,8 +8,8 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-// Top promos más vendidas (simulado)
-const TOP_IDS = ["p8", "p2", "p1", "p4"];
+// Top promos más vendidas
+const TOP_IDS = ["p1", "p4"];
 const TOP = TOP_IDS.map((id) => PRODUCTS.find((p) => p.id === id)!).filter(Boolean);
 
 function Home() {
