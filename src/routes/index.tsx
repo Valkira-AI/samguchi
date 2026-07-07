@@ -1,8 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Phone, MapPin, ExternalLink } from "lucide-react";
+import { Phone, MapPin, ExternalLink, Instagram, Facebook, Link2 } from "lucide-react";
 import { PRODUCTS, formatARS } from "@/lib/products";
 import hero from "@/assets/hero.jpg";
 import logo from "@/assets/logo.png";
+
+// Links a modo figurativo (referencia: El Desembarco)
+const SOCIAL = {
+  instagram: "https://www.instagram.com/eldesembarcook/",
+  facebook: "https://www.facebook.com/eldesembarcoo/",
+  linktree: "https://linktr.ee/eldesembarco",
+};
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -112,8 +119,37 @@ function Home() {
             <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="h-4 w-4" />Av. Senador Perez 450, Jujuy</p>
           </div>
           <div>
-            <h4 className="font-semibold">Horarios</h4>
+            <h4 className="font-semibold">Horarios & Redes</h4>
             <p className="mt-2 text-sm text-muted-foreground">Lun a Dom · 18:00 a 00:30</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <a
+                href={SOCIAL.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium hover:border-primary hover:text-primary"
+              >
+                <Instagram className="h-4 w-4" /> Instagram
+              </a>
+              <a
+                href={SOCIAL.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium hover:border-primary hover:text-primary"
+              >
+                <Facebook className="h-4 w-4" /> Facebook
+              </a>
+              <a
+                href={SOCIAL.linktree}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Linktree"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium hover:border-primary hover:text-primary"
+              >
+                <Link2 className="h-4 w-4" /> Linktree
+              </a>
+            </div>
             <Link to="/admin" className="mt-4 inline-block text-sm text-muted-foreground hover:text-primary hover:underline">
               Panel de administración →
             </Link>
