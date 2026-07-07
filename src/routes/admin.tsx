@@ -326,14 +326,20 @@ function PedidosView() {
 type CatItem = { id: string; nombre: string; categoria: string; precio: number; disponible: boolean; imagen: string };
 
 function CatalogoView() {
+  const availability = useAvailability();
   const initial: CatItem[] = PRODUCTS.map((p: Product) => ({
-    id: p.id, nombre: p.nombre, categoria: p.categoria, precio: p.precio, disponible: true, imagen: p.imagen,
+    id: p.id, nombre: p.nombre, categoria: p.categoria, precio: p.precio, disponible: p.disponible, imagen: p.imagen,
   }));
   const [items, setItems] = useState<CatItem[]>(initial);
   const [editing, setEditing] = useState<CatItem | null>(null);
 
-  const toggle = (id: string) =>
-    setItems((xs) => xs.map((x) => x.id === id ? { ...x, disponible: !x.disponible } : x));
+  const displayItems = items.map((it) => ({ ...it, disponible: isAvailable(it.id, availability) }));
+
+  const toggle = (id: string) => {
+    const current = isAvailable(id, availability);
+    setAvailability(id, !current);
+    toast.success(!current ? "Producto marcado disponible" : "Producto marcado no disponible");
+  };
 
   const save = (updated: CatItem) => {
     setItems((xs) => xs.map((x) => x.id === updated.id ? updated : x));
