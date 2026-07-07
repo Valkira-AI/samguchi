@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock } from "lucide-react";
 import { updateOrderState, useOrders, type Order } from "@/lib/orders-store";
 import { PRODUCTS, formatARS, type Product } from "@/lib/products";
+import { useAvailability, isAvailable, setAvailability } from "@/lib/availability-store";
 import { checkAdminSession, unlockAdmin, lockAdmin } from "@/lib/admin-gate.functions";
 
 export const Route = createFileRoute("/admin")({
