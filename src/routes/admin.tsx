@@ -355,7 +355,7 @@ function CatalogoView() {
         <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_60px] px-6 py-4 border-b border-border text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           <div>Producto</div><div>Categoría</div><div>Precio</div><div>Disponible</div><div />
         </div>
-        {items.map((it) => (
+        {displayItems.map((it) => (
           <div
             key={it.id}
             className={`flex flex-col gap-3 md:grid md:grid-cols-[2fr_1fr_1fr_1fr_60px] md:items-center px-4 md:px-6 py-3 border-b border-border/60 last:border-0 ${!it.disponible ? "opacity-50" : ""}`}
