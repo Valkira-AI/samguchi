@@ -114,10 +114,25 @@ function Menu() {
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((p) => (
-            <article key={p.id} className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:shadow-warm">
+            <article
+              key={p.id}
+              className={`group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:shadow-warm ${!p.disponible ? "opacity-80" : ""}`}
+            >
               <div className="relative aspect-[5/4] overflow-hidden bg-muted">
-                <img src={p.imagen} alt={p.nombre} loading="lazy" width={800} height={640} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                <img
+                  src={p.imagen}
+                  alt={p.nombre}
+                  loading="lazy"
+                  width={800}
+                  height={640}
+                  className={`h-full w-full object-cover transition duration-500 group-hover:scale-105 ${!p.disponible ? "grayscale" : ""}`}
+                />
                 <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2 py-1 text-xs font-semibold">{p.categoria}</span>
+                {!p.disponible && (
+                  <span className="absolute right-3 top-3 rounded-full bg-destructive/90 px-2 py-1 text-xs font-semibold text-destructive-foreground">
+                    No disponible
+                  </span>
+                )}
               </div>
               <div className="p-5">
                 <div className="flex items-start justify-between gap-3">
@@ -126,17 +141,23 @@ function Menu() {
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground">{p.descripcion}</p>
                 <div className="mt-4 flex items-center justify-between">
-                  {cart[p.id] ? (
+                  {p.disponible && cart[p.id] ? (
                     <div className="flex items-center gap-2">
                       <button onClick={() => dec(p.id)} className="rounded-full border border-border p-2 hover:bg-muted"><Minus className="h-4 w-4" /></button>
                       <span className="min-w-8 text-center font-semibold">{cart[p.id]}</span>
                       <button onClick={() => add(p.id)} className="rounded-full border border-border p-2 hover:bg-muted"><Plus className="h-4 w-4" /></button>
                     </div>
                   ) : (
-                    <span className="text-xs text-muted-foreground">Disponible</span>
+                    <span className={`text-xs ${p.disponible ? "text-muted-foreground" : "font-medium text-destructive"}`}>
+                      {p.disponible ? "Disponible" : "No disponible"}
+                    </span>
                   )}
-                  <button onClick={() => add(p.id)} className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">
-                    Agregar
+                  <button
+                    onClick={() => p.disponible && add(p.id)}
+                    disabled={!p.disponible}
+                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
+                  >
+                    {p.disponible ? "Agregar" : "No disponible"}
                   </button>
                 </div>
               </div>
