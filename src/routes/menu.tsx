@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Minus, Plus, ShoppingBag, Trash2, ExternalLink } from "lucide-react";
 import { PRODUCTS, CATEGORIES, formatARS, type Category } from "@/lib/products";
 import { addOrder, type OrderItem } from "@/lib/orders-store";
+import { useAvailability, isAvailable } from "@/lib/availability-store";
 import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/menu")({
