@@ -25,10 +25,15 @@ function Menu() {
   const [cartOpen, setCartOpen] = useState(false);
   const [cliente, setCliente] = useState("");
   const [waLink, setWaLink] = useState<string | null>(null);
+  const availability = useAvailability();
 
-  const filtered = useMemo(
+  const baseList = useMemo(
     () => (activeCat === "Todos" ? PRODUCTS : PRODUCTS.filter((p) => p.categoria === activeCat)),
     [activeCat],
+  );
+  const filtered = useMemo(
+    () => baseList.map((p) => ({ ...p, disponible: isAvailable(p.id, availability) })),
+    [baseList, availability],
   );
 
   const items: OrderItem[] = useMemo(
