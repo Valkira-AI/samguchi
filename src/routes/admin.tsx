@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock } from "lucide-react";
 import { updateOrderState, useOrders, type Order } from "@/lib/orders-store";
 import { PRODUCTS, formatARS, type Product } from "@/lib/products";
+import { useAvailability, isAvailable, setAvailability } from "@/lib/availability-store";
 import { checkAdminSession, unlockAdmin, lockAdmin } from "@/lib/admin-gate.functions";
 
 export const Route = createFileRoute("/admin")({
@@ -325,14 +326,20 @@ function PedidosView() {
 type CatItem = { id: string; nombre: string; categoria: string; precio: number; disponible: boolean; imagen: string };
 
 function CatalogoView() {
+  const availability = useAvailability();
   const initial: CatItem[] = PRODUCTS.map((p: Product) => ({
-    id: p.id, nombre: p.nombre, categoria: p.categoria, precio: p.precio, disponible: true, imagen: p.imagen,
+    id: p.id, nombre: p.nombre, categoria: p.categoria, precio: p.precio, disponible: p.disponible, imagen: p.imagen,
   }));
   const [items, setItems] = useState<CatItem[]>(initial);
   const [editing, setEditing] = useState<CatItem | null>(null);
 
-  const toggle = (id: string) =>
-    setItems((xs) => xs.map((x) => x.id === id ? { ...x, disponible: !x.disponible } : x));
+  const displayItems = items.map((it) => ({ ...it, disponible: isAvailable(it.id, availability) }));
+
+  const toggle = (id: string) => {
+    const current = isAvailable(id, availability);
+    setAvailability(id, !current);
+    toast.success(!current ? "Producto marcado disponible" : "Producto marcado no disponible");
+  };
 
   const save = (updated: CatItem) => {
     setItems((xs) => xs.map((x) => x.id === updated.id ? updated : x));
@@ -348,7 +355,7 @@ function CatalogoView() {
         <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_60px] px-6 py-4 border-b border-border text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           <div>Producto</div><div>Categoría</div><div>Precio</div><div>Disponible</div><div />
         </div>
-        {items.map((it) => (
+        {displayItems.map((it) => (
           <div
             key={it.id}
             className={`flex flex-col gap-3 md:grid md:grid-cols-[2fr_1fr_1fr_1fr_60px] md:items-center px-4 md:px-6 py-3 border-b border-border/60 last:border-0 ${!it.disponible ? "opacity-50" : ""}`}

@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Minus, Plus, ShoppingBag, Trash2, ExternalLink } from "lucide-react";
 import { PRODUCTS, CATEGORIES, formatARS, type Category } from "@/lib/products";
 import { addOrder, type OrderItem } from "@/lib/orders-store";
+import { useAvailability, isAvailable } from "@/lib/availability-store";
 import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/menu")({
@@ -24,10 +25,15 @@ function Menu() {
   const [cartOpen, setCartOpen] = useState(false);
   const [cliente, setCliente] = useState("");
   const [waLink, setWaLink] = useState<string | null>(null);
+  const availability = useAvailability();
 
-  const filtered = useMemo(
+  const baseList = useMemo(
     () => (activeCat === "Todos" ? PRODUCTS : PRODUCTS.filter((p) => p.categoria === activeCat)),
     [activeCat],
+  );
+  const filtered = useMemo(
+    () => baseList.map((p) => ({ ...p, disponible: isAvailable(p.id, availability) })),
+    [baseList, availability],
   );
 
   const items: OrderItem[] = useMemo(
