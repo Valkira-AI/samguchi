@@ -56,13 +56,12 @@ function Home() {
             Milanesas jugosas, lomitos completos y choripán con chimichurri. Hecho a mano, con productos de la tierra.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a
-              href="/menu"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/menu"
               className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-warm hover:opacity-90"
             >
-              Ver el menú <ExternalLink className="h-4 w-4" />
+              Ver el menú
+            </Link>
             </a>
           </div>
         </div>
