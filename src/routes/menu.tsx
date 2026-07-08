@@ -80,7 +80,7 @@ function Menu() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="Sam Guchi" width={40} height={40} className="h-10 w-10 object-contain" />
-            <span className="font-display text-2xl tracking-wide text-primary">SAM GUCHI</span>
+            <span className="font-display text-2xl text-primary">SAM GUCHI</span>
           </Link>
           <button
             onClick={() => setCartOpen(true)}
