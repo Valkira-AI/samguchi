@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Phone, MapPin, ExternalLink, Instagram, Facebook, Link2 } from "lucide-react";
+import { Phone, MapPin, Instagram, Facebook, Link2 } from "lucide-react";
 import { PRODUCTS, formatARS } from "@/lib/products";
-import hero from "@/assets/hero.jpg";
+import heroAsset from "@/assets/hero-menu-wall.png.asset.json";
 import logo from "@/assets/logo.png";
+
+const hero = heroAsset.url;
 
 // Links a modo figurativo (referencia: El Desembarco)
 const SOCIAL = {
@@ -29,14 +31,12 @@ function Home() {
             <img src={logo} alt="Sam Guchi" width={40} height={40} className="h-10 w-10 object-contain" />
             <span className="font-display text-2xl text-primary">SAM GUCHI</span>
           </Link>
-          <a
-            href="/menu"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/menu"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-warm hover:opacity-90"
           >
-            Menú <ExternalLink className="h-4 w-4" />
-          </a>
+            Pedidos
+          </Link>
         </div>
       </header>
 
@@ -56,14 +56,12 @@ function Home() {
             Milanesas jugosas, lomitos completos y choripán con chimichurri. Hecho a mano, con productos de la tierra.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a
-              href="/menu"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/menu"
               className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-warm hover:opacity-90"
             >
-              Ver el menú <ExternalLink className="h-4 w-4" />
-            </a>
+              Ver el menú
+            </Link>
           </div>
         </div>
       </section>
@@ -88,14 +86,12 @@ function Home() {
                 <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.descripcion}</p>
                 <div className="mt-4 flex items-center justify-between">
                   <span className="font-display text-2xl text-primary">{formatARS(p.precio)}</span>
-                  <a
-                    href="/menu"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    to="/menu"
                     className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
                   >
                     Pedir
-                  </a>
+                  </Link>
                 </div>
               </div>
             </article>
