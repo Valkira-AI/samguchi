@@ -1,11 +1,16 @@
 import milanesa from "@/assets/milanesa.jpg";
-import lomito from "@/assets/lomito.jpg";
+import lomitoAsset from "@/assets/lomito-completo.png.asset.json";
 import choripan from "@/assets/choripan.jpg";
-import hamburguesa from "@/assets/hamburguesa.jpg";
+import hamburguesaAsset from "@/assets/hamburguesa-completa.png.asset.json";
 import pebete from "@/assets/pebete.jpg";
 import cerveza from "@/assets/cerveza.jpg";
-import gaseosa from "@/assets/gaseosa.jpg";
-import promo from "@/assets/promo.jpg";
+import gaseosaAsset from "@/assets/gaseosa-cola.png.asset.json";
+import promoAsset from "@/assets/picada-jujena.png.asset.json";
+
+const lomito = lomitoAsset.url;
+const hamburguesa = hamburguesaAsset.url;
+const gaseosa = gaseosaAsset.url;
+const promo = promoAsset.url;
 
 export type Category = "Sándwiches" | "Bebidas" | "Promos";
 
