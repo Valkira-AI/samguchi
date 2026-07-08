@@ -31,14 +31,12 @@ function Home() {
             <img src={logo} alt="Sam Guchi" width={40} height={40} className="h-10 w-10 object-contain" />
             <span className="font-display text-2xl text-primary">SAM GUCHI</span>
           </Link>
-          <a
-            href="/menu"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/menu"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-warm hover:opacity-90"
           >
-            Menú <ExternalLink className="h-4 w-4" />
-          </a>
+            Pedidos
+          </Link>
         </div>
       </header>
 
