@@ -62,7 +62,6 @@ function Home() {
             >
               Ver el menú
             </Link>
-            </a>
           </div>
         </div>
       </section>
