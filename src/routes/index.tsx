@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Phone, MapPin, ExternalLink, Instagram, Facebook, Link2 } from "lucide-react";
+import { Phone, MapPin, Instagram, Facebook, Link2 } from "lucide-react";
 import { PRODUCTS, formatARS } from "@/lib/products";
-import hero from "@/assets/hero.jpg";
+import heroAsset from "@/assets/hero-menu-wall.png.asset.json";
 import logo from "@/assets/logo.png";
+
+const hero = heroAsset.url;
 
 // Links a modo figurativo (referencia: El Desembarco)
 const SOCIAL = {
