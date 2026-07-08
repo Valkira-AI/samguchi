@@ -1,11 +1,16 @@
 import milanesa from "@/assets/milanesa.jpg";
-import lomito from "@/assets/lomito.jpg";
+import lomitoAsset from "@/assets/lomito-completo.png.asset.json";
 import choripan from "@/assets/choripan.jpg";
-import hamburguesa from "@/assets/hamburguesa.jpg";
+import hamburguesaAsset from "@/assets/hamburguesa-completa.png.asset.json";
 import pebete from "@/assets/pebete.jpg";
 import cerveza from "@/assets/cerveza.jpg";
-import gaseosa from "@/assets/gaseosa.jpg";
-import promo from "@/assets/promo.jpg";
+import gaseosaAsset from "@/assets/gaseosa-cola.png.asset.json";
+import promoAsset from "@/assets/picada-jujena.png.asset.json";
+
+const lomito = lomitoAsset.url;
+const hamburguesa = hamburguesaAsset.url;
+const gaseosa = gaseosaAsset.url;
+const promo = promoAsset.url;
 
 export type Category = "Sándwiches" | "Bebidas" | "Promos";
 
@@ -27,7 +32,7 @@ export const PRODUCTS: Product[] = [
   { id: "p5", nombre: "Pebete Jamón y Queso", descripcion: "Clásico pebete tierno con jamón cocido y queso derretido.", precio: 3700, categoria: "Sándwiches", imagen: pebete, disponible: true },
   { id: "p6", nombre: "Cerveza Artesanal", descripcion: "Rubia bien fría, estilo lager argentina.", precio: 2900, categoria: "Bebidas", imagen: cerveza, disponible: true },
   { id: "p7", nombre: "Gaseosa Línea Cola", descripcion: "Botella 500ml bien helada.", precio: 2100, categoria: "Bebidas", imagen: gaseosa, disponible: true },
-  { id: "p8", nombre: "Combo Picada Jujeña", descripcion: "Milanesa + papas + bebida. Ideal para compartir.", precio: 10300, categoria: "Promos", imagen: promo, disponible: true },
+  { id: "p8", nombre: "Combo Picada Jujeña", descripcion: "Variedad de fiambres + Bebida. Ideal para compartir.", precio: 10300, categoria: "Promos", imagen: promo, disponible: true },
 ];
 
 export const CATEGORIES: Category[] = ["Sándwiches", "Bebidas", "Promos"];
