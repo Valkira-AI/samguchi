@@ -86,14 +86,12 @@ function Home() {
                 <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.descripcion}</p>
                 <div className="mt-4 flex items-center justify-between">
                   <span className="font-display text-2xl text-primary">{formatARS(p.precio)}</span>
-                  <a
-                    href="/menu"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    to="/menu"
                     className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
                   >
                     Pedir
-                  </a>
+                  </Link>
                 </div>
               </div>
             </article>
