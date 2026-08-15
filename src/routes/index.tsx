@@ -1,17 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Phone, MapPin, Instagram, Facebook, Link2 } from "lucide-react";
 import { PRODUCTS, formatARS } from "@/lib/products";
 import heroAsset from "@/assets/hero-menu-wall.png.asset.json";
-import logo from "@/assets/logo.png";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 
 const hero = heroAsset.url;
-
-// Links a modo figurativo (referencia: El Desembarco)
-const SOCIAL = {
-  instagram: "https://www.instagram.com/eldesembarcook/",
-  facebook: "https://www.facebook.com/eldesembarcoo/",
-  linktree: "https://linktr.ee/eldesembarco",
-};
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -24,21 +17,17 @@ const TOP = TOP_IDS.map((id) => PRODUCTS.find((p) => p.id === id)!).filter(Boole
 function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="Sam Guchi" width={40} height={40} className="h-10 w-10 object-contain" />
-            <span className="font-display text-2xl text-primary">SAM GUCHI</span>
-          </Link>
+      <SiteHeader
+        action={
           <Link
             to="/menu"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-warm hover:opacity-90"
           >
             Pedidos
           </Link>
-        </div>
-      </header>
+        }
+      />
+
 
       {/* Hero */}
       <section className="relative overflow-hidden">
