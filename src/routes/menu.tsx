@@ -5,7 +5,7 @@ import { Minus, Plus, ShoppingBag, Trash2, ExternalLink } from "lucide-react";
 import { PRODUCTS, CATEGORIES, formatARS, type Category } from "@/lib/products";
 import { addOrder, type OrderItem } from "@/lib/orders-store";
 import { useAvailability, isAvailable } from "@/lib/availability-store";
-import logo from "@/assets/logo.png";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/menu")({
   head: () => ({
@@ -76,12 +76,8 @@ function Menu() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="Sam Guchi" width={40} height={40} className="h-10 w-10 object-contain" />
-            <span className="font-display text-2xl text-primary">SAM GUCHI</span>
-          </Link>
+      <SiteHeader
+        action={
           <button
             onClick={() => setCartOpen(true)}
             className="relative inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-warm hover:opacity-90"
@@ -94,8 +90,9 @@ function Menu() {
               </span>
             )}
           </button>
-        </div>
-      </header>
+        }
+      />
+
 
       <section className="mx-auto max-w-6xl px-4 py-10">
         <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
