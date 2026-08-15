@@ -17,16 +17,7 @@ const TOP = TOP_IDS.map((id) => PRODUCTS.find((p) => p.id === id)!).filter(Boole
 function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader
-        action={
-          <Link
-            to="/menu"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-warm hover:opacity-90"
-          >
-            Pedidos
-          </Link>
-        }
-      />
+      <SiteHeader />
 
 
       {/* Hero */}
