@@ -12,7 +12,8 @@ const NAV = [
 export function SiteHeader({ action }: { action?: ReactNode }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-center gap-3 px-4 py-3 md:justify-between">
+
         <Link to="/" className="flex items-center gap-3">
           <img src={logo} alt="Sam Guchi" width={44} height={44} className="h-11 w-11 object-contain" />
           <span className="leading-none">
