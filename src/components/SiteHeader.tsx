@@ -41,7 +41,7 @@ export function SiteHeader({ action }: { action?: ReactNode }) {
         {action}
       </div>
 
-      <nav className="flex gap-1 overflow-x-auto border-t border-border px-4 py-2 md:hidden">
+      <nav className="flex justify-center gap-1 overflow-x-auto border-t border-border px-4 py-2 md:hidden">
         {NAV.map((n) => (
           <Link
             key={n.to}
