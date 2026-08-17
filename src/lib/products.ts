@@ -2,7 +2,7 @@ import milanesaAsset from "@/assets/milanesa-real.png.asset.json";
 import lomitoAsset from "@/assets/lomito-completo.png.asset.json";
 import choripanAsset from "@/assets/choripan-real.png.asset.json";
 import hamburguesaAsset from "@/assets/hamburguesa-completa.png.asset.json";
-import pebete from "@/assets/pebete.jpg";
+import ruculaBondiolaAsset from "@/assets/sandwich-rucula-bondiola.png.asset.json";
 import cerveza from "@/assets/cerveza.jpg";
 import gaseosaAsset from "@/assets/gaseosa-cola.png.asset.json";
 import promoAsset from "@/assets/picada-jujena.png.asset.json";
