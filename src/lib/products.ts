@@ -1,6 +1,6 @@
 import milanesaAsset from "@/assets/milanesa-real.png.asset.json";
 import lomitoAsset from "@/assets/lomito-completo.png.asset.json";
-import choripan from "@/assets/choripan.jpg";
+import choripanAsset from "@/assets/choripan-real.png.asset.json";
 import hamburguesaAsset from "@/assets/hamburguesa-completa.png.asset.json";
 import pebete from "@/assets/pebete.jpg";
 import cerveza from "@/assets/cerveza.jpg";
