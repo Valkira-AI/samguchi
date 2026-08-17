@@ -82,16 +82,18 @@ function Menu() {
       <button
         onClick={() => setCartOpen(true)}
         aria-label="Abrir carrito"
-        className="fixed right-4 top-1/2 z-40 -translate-y-1/2 inline-flex h-16 w-16 flex-col items-center justify-center rounded-full bg-primary text-primary-foreground shadow-warm ring-4 ring-primary/20 transition hover:scale-105 hover:opacity-95"
+        className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-primary-foreground shadow-warm ring-4 ring-primary/20 transition hover:scale-105 hover:opacity-95"
       >
         <ShoppingBag className="h-6 w-6" />
-        {count > 0 && (
-          <span className="absolute -right-1 -top-1 grid h-6 min-w-6 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-accent-foreground shadow">
-            {count}
-          </span>
-        )}
-        {count > 0 && (
-          <span className="mt-0.5 text-[10px] font-bold leading-none">{formatARS(total)}</span>
+        {count > 0 ? (
+          <>
+            <span className="grid h-6 min-w-6 place-items-center rounded-full bg-accent px-1.5 text-xs font-bold text-accent-foreground shadow">
+              {count}
+            </span>
+            <span className="text-sm font-bold leading-none">{formatARS(total)}</span>
+          </>
+        ) : (
+          <span className="text-sm font-bold leading-none">Carrito</span>
         )}
       </button>
 
