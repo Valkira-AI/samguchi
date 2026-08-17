@@ -33,7 +33,7 @@ function Home() {
             Sándwiches que <span className="text-primary">se sienten en el alma</span>.
           </h1>
           <p className="mt-4 max-w-xl text-lg text-muted-foreground">
-            Milanesas jugosas, lomitos completos y choripán con chimichurri. Hecho a mano, con productos de la tierra.
+            Milanesas doradas al punto justo, lomitos que no se guardan nada y un choripán que lleva el sello jujeño en cada chispa de chimichurri. Compartí con nosotros el gusto de lo auténtico.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
