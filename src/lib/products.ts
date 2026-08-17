@@ -1,4 +1,4 @@
-import milanesa from "@/assets/milanesa.jpg";
+import milanesaAsset from "@/assets/milanesa-real.png.asset.json";
 import lomitoAsset from "@/assets/lomito-completo.png.asset.json";
 import choripan from "@/assets/choripan.jpg";
 import hamburguesaAsset from "@/assets/hamburguesa-completa.png.asset.json";
