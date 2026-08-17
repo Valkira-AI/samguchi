@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import logo from "@/assets/logo.png";
+import logoAsset from "@/assets/logosamguchi.png.asset.json";
+
+const logo = logoAsset.url;
 
 const NAV = [
   { to: "/", label: "Inicio", exact: true },

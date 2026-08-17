@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Phone, MapPin, Instagram, Facebook, Link2 } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logoAsset from "@/assets/logosamguchi.png.asset.json";
+
+const logo = logoAsset.url;
 
 const SOCIAL = {
   instagram: "https://www.instagram.com/eldesembarcook/",
