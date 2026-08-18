@@ -6,6 +6,8 @@ import { CATEGORIES, formatARS, type Category } from "@/lib/products";
 import { addOrder, type OrderItem } from "@/lib/orders-store";
 import { useCatalog } from "@/lib/catalog-store";
 import { SiteHeader } from "@/components/SiteHeader";
+import { HOURS_LABEL, isWithinServiceHours } from "@/lib/hours";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/menu")({
   head: () => ({
