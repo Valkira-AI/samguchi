@@ -28,6 +28,14 @@ function Menu() {
   const [cliente, setCliente] = useState("");
   const [waLink, setWaLink] = useState<string | null>(null);
   const products = useCatalog();
+  const [abierto, setAbierto] = useState(true);
+
+  useEffect(() => {
+    const tick = () => setAbierto(isWithinServiceHours());
+    tick();
+    const t = setInterval(tick, 30_000);
+    return () => clearInterval(t);
+  }, []);
 
   const filtered = useMemo(
     () => (activeCat === "Todos" ? products : products.filter((p) => p.categoria === activeCat)),
