@@ -6,6 +6,8 @@ import { CATEGORIES, formatARS, type Category } from "@/lib/products";
 import { addOrder, type OrderItem } from "@/lib/orders-store";
 import { useCatalog } from "@/lib/catalog-store";
 import { SiteHeader } from "@/components/SiteHeader";
+import { HOURS_LABEL, isWithinServiceHours } from "@/lib/hours";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/menu")({
   head: () => ({
@@ -26,6 +28,14 @@ function Menu() {
   const [cliente, setCliente] = useState("");
   const [waLink, setWaLink] = useState<string | null>(null);
   const products = useCatalog();
+  const [abierto, setAbierto] = useState(true);
+
+  useEffect(() => {
+    const tick = () => setAbierto(isWithinServiceHours());
+    tick();
+    const t = setInterval(tick, 30_000);
+    return () => clearInterval(t);
+  }, []);
 
   const filtered = useMemo(
     () => (activeCat === "Todos" ? products : products.filter((p) => p.categoria === activeCat)),
@@ -57,6 +67,10 @@ function Menu() {
   };
 
   const enviarPedido = () => {
+    if (!isWithinServiceHours()) {
+      setAbierto(false);
+      return toast.error(`Estamos cerrados. Pedidos de ${HOURS_LABEL} hs`);
+    }
     if (items.length === 0) return toast.error("Tu pedido está vacío");
     if (!cliente.trim()) return toast.error("Ingresá tu nombre");
     const order = addOrder({ cliente: cliente.trim(), items, total });

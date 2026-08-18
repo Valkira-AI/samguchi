@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Phone, MapPin, Instagram, Facebook, Link2 } from "lucide-react";
 import logoAsset from "@/assets/logosamguchi.png.asset.json";
+import { HOURS_LABEL_FULL } from "@/lib/hours";
 
 const logo = logoAsset.url;
 
@@ -34,7 +35,8 @@ export function SiteFooter() {
         </div>
         <div>
           <h4 className="font-semibold">Horarios & Redes</h4>
-          <p className="mt-2 text-sm text-muted-foreground">Lun a Dom · 18:00 a 00:30</p>
+          <p className="mt-2 text-sm text-muted-foreground">{HOURS_LABEL_FULL}</p>
+          <p className="text-xs text-muted-foreground">Pedidos online dentro de ese horario.</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium hover:border-primary hover:text-primary">
               <Instagram className="h-4 w-4" /> Instagram
