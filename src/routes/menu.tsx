@@ -67,6 +67,10 @@ function Menu() {
   };
 
   const enviarPedido = () => {
+    if (!isWithinServiceHours()) {
+      setAbierto(false);
+      return toast.error(`Estamos cerrados. Pedidos de ${HOURS_LABEL} hs`);
+    }
     if (items.length === 0) return toast.error("Tu pedido está vacío");
     if (!cliente.trim()) return toast.error("Ingresá tu nombre");
     const order = addOrder({ cliente: cliente.trim(), items, total });
