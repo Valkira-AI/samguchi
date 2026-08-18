@@ -3,10 +3,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock } from "lucide-react";
+import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock, Plus, Trash2 } from "lucide-react";
 import { updateOrderState, useOrders, type Order } from "@/lib/orders-store";
-import { PRODUCTS, formatARS, type Product } from "@/lib/products";
-import { useAvailability, isAvailable, setAvailability } from "@/lib/availability-store";
+import { formatARS, CATEGORIES, type Product, type Category } from "@/lib/products";
+import { useCatalog, updateProduct, setProductAvailability, createProduct, deleteProduct } from "@/lib/catalog-store";
 import { checkAdminSession, unlockAdmin, lockAdmin } from "@/lib/admin-gate.functions";
 
 export const Route = createFileRoute("/admin")({
