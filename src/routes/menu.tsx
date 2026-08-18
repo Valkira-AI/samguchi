@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Minus, Plus, ShoppingBag, Trash2, ExternalLink } from "lucide-react";
-import { PRODUCTS, CATEGORIES, formatARS, type Category } from "@/lib/products";
+import { CATEGORIES, formatARS, type Category } from "@/lib/products";
 import { addOrder, type OrderItem } from "@/lib/orders-store";
-import { useAvailability, isAvailable } from "@/lib/availability-store";
+import { useCatalog } from "@/lib/catalog-store";
 import { SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/menu")({
@@ -25,26 +25,23 @@ function Menu() {
   const [cartOpen, setCartOpen] = useState(false);
   const [cliente, setCliente] = useState("");
   const [waLink, setWaLink] = useState<string | null>(null);
-  const availability = useAvailability();
+  const products = useCatalog();
 
-  const baseList = useMemo(
-    () => (activeCat === "Todos" ? PRODUCTS : PRODUCTS.filter((p) => p.categoria === activeCat)),
-    [activeCat],
-  );
   const filtered = useMemo(
-    () => baseList.map((p) => ({ ...p, disponible: isAvailable(p.id, availability) })),
-    [baseList, availability],
+    () => (activeCat === "Todos" ? products : products.filter((p) => p.categoria === activeCat)),
+    [activeCat, products],
   );
 
   const items: OrderItem[] = useMemo(
     () =>
       Object.entries(cart)
         .map(([id, cantidad]) => {
-          const p = PRODUCTS.find((x) => x.id === id)!;
+          const p = products.find((x) => x.id === id);
+          if (!p) return null;
           return { id, nombre: p.nombre, precio: p.precio, cantidad };
         })
-        .filter((i) => i.cantidad > 0),
-    [cart],
+        .filter((i): i is OrderItem => i !== null && i.cantidad > 0),
+    [cart, products],
   );
 
   const total = items.reduce((s, i) => s + i.precio * i.cantidad, 0);
