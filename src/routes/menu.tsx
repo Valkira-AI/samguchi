@@ -123,14 +123,18 @@ function Menu() {
               className={`group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:shadow-warm ${!p.disponible ? "opacity-80" : ""}`}
             >
               <div className="relative aspect-[5/4] overflow-hidden bg-muted">
-                <img
-                  src={p.imagen}
-                  alt={p.nombre}
-                  loading="lazy"
-                  width={800}
-                  height={640}
-                  className={`h-full w-full object-cover transition duration-500 group-hover:scale-105 ${!p.disponible ? "grayscale" : ""}`}
-                />
+                {p.imagen ? (
+                  <img
+                    src={p.imagen}
+                    alt={p.nombre}
+                    loading="lazy"
+                    width={800}
+                    height={640}
+                    className={`h-full w-full object-cover transition duration-500 group-hover:scale-105 ${!p.disponible ? "grayscale" : ""}`}
+                  />
+                ) : (
+                  <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">Sin imagen</div>
+                )}
                 <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2 py-1 text-xs font-semibold">{p.categoria}</span>
                 {!p.disponible && (
                   <span className="absolute right-3 top-3 rounded-full bg-destructive/90 px-2 py-1 text-xs font-semibold text-destructive-foreground">
