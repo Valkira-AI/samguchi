@@ -3,10 +3,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock } from "lucide-react";
+import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock, Plus, Trash2 } from "lucide-react";
 import { updateOrderState, useOrders, type Order } from "@/lib/orders-store";
-import { PRODUCTS, formatARS, type Product } from "@/lib/products";
-import { useAvailability, isAvailable, setAvailability } from "@/lib/availability-store";
+import { formatARS, CATEGORIES, type Product, type Category } from "@/lib/products";
+import { useCatalog, updateProduct, setProductAvailability, createProduct, deleteProduct } from "@/lib/catalog-store";
 import { checkAdminSession, unlockAdmin, lockAdmin } from "@/lib/admin-gate.functions";
 
 export const Route = createFileRoute("/admin")({
@@ -323,45 +323,81 @@ function PedidosView() {
 }
 
 /* ---------- Catálogo ---------- */
-type CatItem = { id: string; nombre: string; categoria: string; precio: number; disponible: boolean; imagen: string };
+type Draft = Omit<Product, "id"> & { id?: string };
+
+const EMPTY_DRAFT: Draft = {
+  nombre: "",
+  descripcion: "",
+  precio: 0,
+  categoria: "Sándwiches",
+  imagen: "",
+  disponible: true,
+};
 
 function CatalogoView() {
-  const availability = useAvailability();
-  const initial: CatItem[] = PRODUCTS.map((p: Product) => ({
-    id: p.id, nombre: p.nombre, categoria: p.categoria, precio: p.precio, disponible: p.disponible, imagen: p.imagen,
-  }));
-  const [items, setItems] = useState<CatItem[]>(initial);
-  const [editing, setEditing] = useState<CatItem | null>(null);
+  const items = useCatalog();
+  const [editing, setEditing] = useState<Draft | null>(null);
 
-  const displayItems = items.map((it) => ({ ...it, disponible: isAvailable(it.id, availability) }));
-
-  const toggle = (id: string) => {
-    const current = isAvailable(id, availability);
-    setAvailability(id, !current);
-    toast.success(!current ? "Producto marcado disponible" : "Producto marcado no disponible");
+  const toggle = (p: Product) => {
+    setProductAvailability(p.id, !p.disponible);
+    toast.success(!p.disponible ? "Producto marcado disponible" : "Producto marcado no disponible");
   };
 
-  const save = (updated: CatItem) => {
-    setItems((xs) => xs.map((x) => x.id === updated.id ? updated : x));
+  const save = (d: Draft) => {
+    if (!d.nombre.trim()) {
+      toast.error("El nombre es obligatorio");
+      return;
+    }
+    if (!Number.isFinite(d.precio) || d.precio < 0) {
+      toast.error("Precio inválido");
+      return;
+    }
+    if (d.id) {
+      const { id, ...patch } = d;
+      updateProduct(id, patch);
+      toast.success("Producto actualizado");
+    } else {
+      const { id: _omit, ...rest } = d;
+      createProduct(rest);
+      toast.success("Producto creado");
+    }
     setEditing(null);
-    toast.success("Producto actualizado");
+  };
+
+  const remove = (p: Product) => {
+    if (!window.confirm(`¿Eliminar "${p.nombre}" del catálogo?`)) return;
+    deleteProduct(p.id);
+    toast.success("Producto eliminado");
   };
 
   return (
     <div>
-      <h1 className="font-display text-2xl md:text-4xl mb-6 text-foreground">GESTIÓN DE CATÁLOGO</h1>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-display text-2xl md:text-4xl text-foreground">GESTIÓN DE CATÁLOGO</h1>
+        <button
+          onClick={() => setEditing({ ...EMPTY_DRAFT })}
+          className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+        >
+          <Plus className="h-4 w-4" /> Nuevo producto
+        </button>
+      </div>
 
       <div className="rounded-2xl bg-card border border-border overflow-hidden">
-        <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_60px] px-6 py-4 border-b border-border text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_100px] px-6 py-4 border-b border-border text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           <div>Producto</div><div>Categoría</div><div>Precio</div><div>Disponible</div><div />
         </div>
-        {displayItems.map((it) => (
+        {items.length === 0 && (
+          <div className="px-6 py-10 text-center text-sm text-muted-foreground">No hay productos en el catálogo.</div>
+        )}
+        {items.map((it) => (
           <div
             key={it.id}
-            className={`flex flex-col gap-3 md:grid md:grid-cols-[2fr_1fr_1fr_1fr_60px] md:items-center px-4 md:px-6 py-3 border-b border-border/60 last:border-0 ${!it.disponible ? "opacity-50" : ""}`}
+            className={`flex flex-col gap-3 md:grid md:grid-cols-[2fr_1fr_1fr_1fr_100px] md:items-center px-4 md:px-6 py-3 border-b border-border/60 last:border-0 ${!it.disponible ? "opacity-50" : ""}`}
           >
             <div className="flex items-center gap-3 min-w-0">
-              <img src={it.imagen} alt={it.nombre} className="h-11 w-11 shrink-0 rounded-full object-cover" />
+              {it.imagen
+                ? <img src={it.imagen} alt={it.nombre} className="h-11 w-11 shrink-0 rounded-full object-cover" />
+                : <div className="h-11 w-11 shrink-0 rounded-full bg-muted" />}
               <span className="font-medium truncate">{it.nombre}</span>
             </div>
             <div className="text-sm text-muted-foreground md:block">
@@ -371,7 +407,7 @@ function CatalogoView() {
             <div className="flex items-center justify-between md:block">
               <span className="md:hidden text-xs uppercase tracking-wide text-muted-foreground">Disponible</span>
               <button
-                onClick={() => toggle(it.id)}
+                onClick={() => toggle(it)}
                 className={`inline-flex items-center rounded-full border px-4 py-1 text-xs font-bold uppercase transition ${
                   it.disponible
                     ? "border-emerald-300 bg-emerald-50 text-emerald-700"
@@ -381,40 +417,64 @@ function CatalogoView() {
                 {it.disponible ? "Sí" : "No"}
               </button>
             </div>
-            <button
-              onClick={() => setEditing(it)}
-              className="self-end md:self-auto md:justify-self-end grid h-9 w-9 place-items-center rounded-full hover:bg-muted"
-              aria-label="Editar"
-            >
-              <Pencil className="h-4 w-4" />
-            </button>
+            <div className="flex gap-1 self-end md:self-auto md:justify-self-end">
+              <button
+                onClick={() => setEditing({ ...it })}
+                className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted"
+                aria-label={`Editar ${it.nombre}`}
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => remove(it)}
+                className="grid h-9 w-9 place-items-center rounded-full text-red-600 hover:bg-red-50"
+                aria-label={`Eliminar ${it.nombre}`}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         ))}
       </div>
 
-
       {editing && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4" onClick={() => setEditing(null)}>
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 overflow-y-auto" onClick={() => setEditing(null)}>
           <div className="w-full max-w-md rounded-2xl bg-card p-6 border border-border" onClick={(e) => e.stopPropagation()}>
-            <h2 className="font-display text-2xl mb-4">Editar producto</h2>
+            <h2 className="font-display text-2xl mb-4">{editing.id ? "Editar producto" : "Nuevo producto"}</h2>
             <label className="text-sm font-medium">Nombre</label>
             <input
               className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               value={editing.nombre}
               onChange={(e) => setEditing({ ...editing, nombre: e.target.value })}
             />
+            <label className="mt-3 block text-sm font-medium">Descripción</label>
+            <textarea
+              rows={2}
+              className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              value={editing.descripcion}
+              onChange={(e) => setEditing({ ...editing, descripcion: e.target.value })}
+            />
             <label className="mt-3 block text-sm font-medium">Categoría</label>
-            <input
+            <select
               className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               value={editing.categoria}
-              onChange={(e) => setEditing({ ...editing, categoria: e.target.value })}
-            />
+              onChange={(e) => setEditing({ ...editing, categoria: e.target.value as Category })}
+            >
+              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
             <label className="mt-3 block text-sm font-medium">Precio</label>
             <input
               type="number"
+              min={0}
               className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               value={editing.precio}
               onChange={(e) => setEditing({ ...editing, precio: Number(e.target.value) })}
+            />
+            <label className="mt-3 block text-sm font-medium">Imagen (URL)</label>
+            <input
+              className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              value={editing.imagen}
+              onChange={(e) => setEditing({ ...editing, imagen: e.target.value })}
             />
             <label className="mt-3 flex items-center gap-2 text-sm">
               <input

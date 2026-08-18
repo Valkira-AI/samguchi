@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PRODUCTS, formatARS } from "@/lib/products";
+import { formatARS } from "@/lib/products";
+import { useCatalog } from "@/lib/catalog-store";
 import heroAsset from "@/assets/hero-menu-wall.png.asset.json";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -12,9 +13,12 @@ export const Route = createFileRoute("/")({
 
 // Top promos más vendidas
 const TOP_IDS = ["p1", "p4"];
-const TOP = TOP_IDS.map((id) => PRODUCTS.find((p) => p.id === id)!).filter(Boolean);
 
 function Home() {
+  const products = useCatalog();
+  const TOP = TOP_IDS.map((id) => products.find((p) => p.id === id)).filter(
+    (p): p is NonNullable<typeof p> => Boolean(p),
+  );
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
