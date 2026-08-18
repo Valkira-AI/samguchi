@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Phone, MapPin, Instagram, Facebook, Link2 } from "lucide-react";
 import logoAsset from "@/assets/logosamguchi.png.asset.json";
+import { HOURS_LABEL_FULL } from "@/lib/hours";
 
 const logo = logoAsset.url;
 
