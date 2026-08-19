@@ -246,7 +246,10 @@ function PedidosView() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl md:text-4xl mb-6 text-foreground">DASHBOARD DE PEDIDOS</h1>
+      <h1 className="font-display text-2xl md:text-4xl mb-2 text-foreground">DASHBOARD DE PEDIDOS</h1>
+      <p className="mb-6 inline-flex rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+        Horario de pedidos: {HOURS_LABEL} hs
+      </p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {(Object.keys(counts) as Order["estado"][]).map((e) => (
