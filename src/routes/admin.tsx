@@ -8,6 +8,7 @@ import { updateOrderState, useOrders, type Order } from "@/lib/orders-store";
 import { formatARS, CATEGORIES, type Product, type Category } from "@/lib/products";
 import { useCatalog, updateProduct, setProductAvailability, createProduct, deleteProduct } from "@/lib/catalog-store";
 import { checkAdminSession, unlockAdmin, lockAdmin } from "@/lib/admin-gate.functions";
+import { HOURS_LABEL, isOrderInServiceHours } from "@/lib/hours";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
