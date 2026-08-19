@@ -114,6 +114,10 @@ function Menu() {
           <div>
             <h1 className="font-display text-4xl md:text-5xl">Nuestro menú</h1>
             <p className="mt-1 text-muted-foreground">Elegí, sumá al pedido y enviálo por WhatsApp.</p>
+            <p className={`mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${abierto ? "border-primary/40 bg-primary/10 text-primary" : "border-destructive/40 bg-destructive/10 text-destructive"}`}>
+              <span className={`h-2 w-2 rounded-full ${abierto ? "bg-primary" : "bg-destructive"}`} />
+              {abierto ? `Abierto ahora · Pedidos de ${HOURS_LABEL} hs` : `Cerrado · Pedidos de ${HOURS_LABEL} hs`}
+            </p>
           </div>
           <div className="flex flex-wrap gap-2">
             {(["Todos", ...CATEGORIES] as const).map((c) => (
