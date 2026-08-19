@@ -8,6 +8,7 @@ import { updateOrderState, useOrders, type Order } from "@/lib/orders-store";
 import { formatARS, CATEGORIES, type Product, type Category } from "@/lib/products";
 import { useCatalog, updateProduct, setProductAvailability, createProduct, deleteProduct } from "@/lib/catalog-store";
 import { checkAdminSession, unlockAdmin, lockAdmin } from "@/lib/admin-gate.functions";
+import { HOURS_LABEL, isOrderInServiceHours } from "@/lib/hours";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -32,11 +33,11 @@ type DemoOrder = {
   total: number;
 };
 const DEMO_ORDERS: DemoOrder[] = [
-  { id: "#1001", estado: "Nuevo", cliente: "Marcos R.", hora: "14:32 hs", items: [{ cant: 2, nombre: "Milanesa Simple" }, { cant: 2, nombre: "Coca-Cola 500ml" }], total: 8800 },
-  { id: "#1002", estado: "En Preparación", cliente: "Laura G.", hora: "14:25 hs", items: [{ cant: 1, nombre: "Lomito Simple" }, { cant: 1, nombre: "Agua Mineral 500ml" }], total: 6600 },
-  { id: "#1003", estado: "Despachado", cliente: "Diego M.", hora: "14:10 hs", items: [{ cant: 1, nombre: "Hamburguesa Clásica" }, { cant: 1, nombre: "Jugo Natural" }], total: 5700 },
-  { id: "#1004", estado: "Finalizado", cliente: "Sofía P.", hora: "13:55 hs", items: [{ cant: 2, nombre: "Milanesa Completa" }], total: 9000 },
-  { id: "#1005", estado: "Finalizado", cliente: "Julián A.", hora: "13:40 hs", items: [{ cant: 1, nombre: "Lomito Completo" }, { cant: 2, nombre: "Coca-Cola 500ml" }], total: 8800 },
+  { id: "#1001", estado: "Nuevo", cliente: "Marcos R.", hora: "20:32 hs", items: [{ cant: 2, nombre: "Milanesa Simple" }, { cant: 2, nombre: "Coca-Cola 500ml" }], total: 8800 },
+  { id: "#1002", estado: "En Preparación", cliente: "Laura G.", hora: "20:55 hs", items: [{ cant: 1, nombre: "Lomito Simple" }, { cant: 1, nombre: "Agua Mineral 500ml" }], total: 6600 },
+  { id: "#1003", estado: "Despachado", cliente: "Diego M.", hora: "21:40 hs", items: [{ cant: 1, nombre: "Hamburguesa Clásica" }, { cant: 1, nombre: "Jugo Natural" }], total: 5700 },
+  { id: "#1004", estado: "Finalizado", cliente: "Sofía P.", hora: "22:30 hs", items: [{ cant: 2, nombre: "Milanesa Completa" }], total: 9000 },
+  { id: "#1005", estado: "Finalizado", cliente: "Julián A.", hora: "23:15 hs", items: [{ cant: 1, nombre: "Lomito Completo" }, { cant: 2, nombre: "Coca-Cola 500ml" }], total: 8800 },
 ];
 
 const NEXT_STATE: Record<Order["estado"], Order["estado"] | null> = {
@@ -211,7 +212,11 @@ function NavBtn({ icon: Icon, label, active, onClick }: { icon: typeof LayoutGri
 
 /* ---------- Pedidos ---------- */
 function PedidosView() {
-  const realOrders = useOrders();
+  const allOrders = useOrders();
+  const realOrders = useMemo(
+    () => allOrders.filter((o) => isOrderInServiceHours(o.fecha)),
+    [allOrders],
+  );
   const [demoStates, setDemoStates] = useState<Record<string, Order["estado"]>>(
     () => Object.fromEntries(DEMO_ORDERS.map((o) => [o.id, o.estado])),
   );
@@ -241,7 +246,10 @@ function PedidosView() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl md:text-4xl mb-6 text-foreground">DASHBOARD DE PEDIDOS</h1>
+      <h1 className="font-display text-2xl md:text-4xl mb-2 text-foreground">DASHBOARD DE PEDIDOS</h1>
+      <p className="mb-6 inline-flex rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+        Horario de pedidos: {HOURS_LABEL} hs
+      </p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {(Object.keys(counts) as Order["estado"][]).map((e) => (
@@ -288,7 +296,7 @@ function PedidosView() {
 
         {realOrders.length > 0 && (
           <>
-            <h2 className="font-display text-2xl mt-8 mb-2">Pedidos reales</h2>
+            <h2 className="font-display text-2xl mt-8 mb-2">Historial de pedidos · {HOURS_LABEL} hs</h2>
             {realOrders.map((o) => (
               <div key={o.id} className="rounded-2xl bg-card border border-border p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
