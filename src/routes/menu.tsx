@@ -238,8 +238,13 @@ function Menu() {
                 <span className="text-sm text-muted-foreground">Total</span>
                 <span className="font-display text-2xl text-primary">{formatARS(total)}</span>
               </div>
-              <button onClick={enviarPedido} disabled={items.length === 0} className="w-full rounded-full bg-primary py-3 font-semibold text-primary-foreground shadow-warm hover:opacity-90 disabled:opacity-50">
-                Enviar por WhatsApp
+              {!abierto && (
+                <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
+                  Estamos cerrados. Tomamos pedidos de {HOURS_LABEL} hs.
+                </p>
+              )}
+              <button onClick={enviarPedido} disabled={items.length === 0 || !abierto} className="w-full rounded-full bg-primary py-3 font-semibold text-primary-foreground shadow-warm hover:opacity-90 disabled:opacity-50">
+                {abierto ? "Enviar por WhatsApp" : `Cerrado · ${HOURS_LABEL} hs`}
               </button>
             </div>
           </aside>
