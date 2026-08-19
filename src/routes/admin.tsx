@@ -211,7 +211,11 @@ function NavBtn({ icon: Icon, label, active, onClick }: { icon: typeof LayoutGri
 
 /* ---------- Pedidos ---------- */
 function PedidosView() {
-  const realOrders = useOrders();
+  const allOrders = useOrders();
+  const realOrders = useMemo(
+    () => allOrders.filter((o) => isOrderInServiceHours(o.fecha)),
+    [allOrders],
+  );
   const [demoStates, setDemoStates] = useState<Record<string, Order["estado"]>>(
     () => Object.fromEntries(DEMO_ORDERS.map((o) => [o.id, o.estado])),
   );
