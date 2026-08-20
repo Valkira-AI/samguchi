@@ -11,31 +11,31 @@ const SOCIAL = {
 export function SiteFooter() {
   return (
     <footer id="contacto" className="border-t border-border bg-background">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-2">
+      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 px-4 py-10 sm:gap-8">
         <div>
           <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Contacto</h4>
           <div className="mt-4 space-y-2">
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Phone className="h-4 w-4 text-primary" /> +54 9 388 400-0000
+            <p className="flex items-center gap-2 text-xs text-muted-foreground sm:text-sm">
+              <Phone className="h-3.5 w-3.5 text-primary sm:h-4 sm:w-4" /> +54 9 388 400-0000
             </p>
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4 text-primary" /> Av. Senador Perez 450, Jujuy
+            <p className="flex items-center gap-2 text-xs text-muted-foreground sm:text-sm">
+              <MapPin className="h-3.5 w-3.5 text-primary sm:h-4 sm:w-4" /> Av. Senador Perez 450, Jujuy
             </p>
           </div>
         </div>
         <div>
           <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Horarios & Redes</h4>
-          <p className="mt-4 text-sm text-muted-foreground">{HOURS_LABEL_FULL}</p>
+          <p className="mt-4 text-xs text-muted-foreground sm:text-sm">{HOURS_LABEL_FULL}</p>
           <p className="text-xs text-muted-foreground">Pedidos online dentro de ese horario.</p>
-          <div className="mt-4 flex flex-wrap gap-4">
-            <a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
-              <Instagram className="h-4 w-4" /> Instagram
+          <div className="mt-4 flex flex-wrap gap-2 sm:gap-4">
+            <a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary sm:text-sm">
+              <Instagram className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Instagram
             </a>
-            <a href={SOCIAL.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
-              <Facebook className="h-4 w-4" /> Facebook
+            <a href={SOCIAL.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary sm:text-sm">
+              <Facebook className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Facebook
             </a>
-            <a href={SOCIAL.linktree} target="_blank" rel="noopener noreferrer" aria-label="Linktree" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
-              <Link2 className="h-4 w-4" /> Linktree
+            <a href={SOCIAL.linktree} target="_blank" rel="noopener noreferrer" aria-label="Linktree" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary sm:text-sm">
+              <Link2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Linktree
             </a>
           </div>
         </div>
