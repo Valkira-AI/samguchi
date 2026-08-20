@@ -29,13 +29,13 @@ export function SiteFooter() {
           <p className="text-xs text-muted-foreground">Pedidos online dentro de ese horario.</p>
           <div className="mt-4 flex flex-wrap gap-2 sm:gap-4">
             <a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary sm:text-sm">
-              <Instagram className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Instagram
+              <Instagram className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> www.instagram.com
             </a>
             <a href={SOCIAL.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary sm:text-sm">
-              <Facebook className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Facebook
+              <Facebook className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> www.facebook.com
             </a>
             <a href={SOCIAL.linktree} target="_blank" rel="noopener noreferrer" aria-label="Linktree" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary sm:text-sm">
-              <Link2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Linktree
+              <Link2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> www.linktr.ee
             </a>
           </div>
         </div>
