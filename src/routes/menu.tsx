@@ -27,6 +27,7 @@ function Menu() {
   const [cartOpen, setCartOpen] = useState(false);
   const [cliente, setCliente] = useState("");
   const [waLink, setWaLink] = useState<string | null>(null);
+  const [variants, setVariants] = useState<Record<string, string>>({});
   const products = useCatalog();
   const [abierto, setAbierto] = useState(true);
 
