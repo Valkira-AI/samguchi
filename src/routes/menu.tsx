@@ -49,7 +49,8 @@ function Menu() {
         .map(([id, cantidad]) => {
           const p = products.find((x) => x.id === id);
           if (!p) return null;
-          return { id, nombre: p.nombre, precio: p.precio, cantidad };
+          const v = p.variantes?.length ? variants[id] || p.variantes[0] : null;
+          return { id, nombre: v ? `${p.nombre} (${v})` : p.nombre, precio: p.precio, cantidad };
         })
         .filter((i): i is OrderItem => i !== null && i.cantidad > 0),
     [cart, products],
