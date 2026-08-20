@@ -25,17 +25,17 @@ export function SiteFooter() {
         </div>
         <div>
           <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Horarios & Redes</h4>
-          <p className="mt-4 text-sm text-muted-foreground">{HOURS_LABEL_FULL}</p>
+          <p className="mt-4 text-xs text-muted-foreground sm:text-sm">{HOURS_LABEL_FULL}</p>
           <p className="text-xs text-muted-foreground">Pedidos online dentro de ese horario.</p>
-          <div className="mt-4 flex flex-wrap gap-4">
-            <a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
-              <Instagram className="h-4 w-4" /> Instagram
+          <div className="mt-4 flex flex-wrap gap-2 sm:gap-4">
+            <a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary sm:text-sm">
+              <Instagram className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Instagram
             </a>
-            <a href={SOCIAL.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
-              <Facebook className="h-4 w-4" /> Facebook
+            <a href={SOCIAL.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary sm:text-sm">
+              <Facebook className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Facebook
             </a>
-            <a href={SOCIAL.linktree} target="_blank" rel="noopener noreferrer" aria-label="Linktree" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
-              <Link2 className="h-4 w-4" /> Linktree
+            <a href={SOCIAL.linktree} target="_blank" rel="noopener noreferrer" aria-label="Linktree" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary sm:text-sm">
+              <Link2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Linktree
             </a>
           </div>
         </div>
