@@ -168,7 +168,20 @@ function Menu() {
                   <span className="whitespace-nowrap font-semibold text-primary">{formatARS(p.precio)}</span>
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground">{p.descripcion}</p>
-                <div className="mt-4 flex items-center justify-between">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+                  {p.variantes?.length ? (
+                    <select
+                      aria-label={`Variante de ${p.nombre}`}
+                      value={variants[p.id] || p.variantes[0]}
+                      onChange={(e) => setVariants((v) => ({ ...v, [p.id]: e.target.value }))}
+                      disabled={!p.disponible}
+                      className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium outline-none focus:border-primary disabled:opacity-50"
+                    >
+                      {p.variantes.map((v) => (
+                        <option key={v} value={v}>{v}</option>
+                      ))}
+                    </select>
+                  ) : null}
                   {p.disponible && cart[p.id] ? (
                     <div className="flex items-center gap-2">
                       <button onClick={() => dec(p.id)} className="rounded-full border border-border p-2 hover:bg-muted"><Minus className="h-4 w-4" /></button>
