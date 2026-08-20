@@ -11,7 +11,7 @@ const SOCIAL = {
 export function SiteFooter() {
   return (
     <footer id="contacto" className="border-t border-border bg-background">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-2">
+      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 px-4 py-10 sm:gap-8">
         <div>
           <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Contacto</h4>
           <div className="mt-4 space-y-2">
