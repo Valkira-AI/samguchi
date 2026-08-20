@@ -3,9 +3,9 @@ import { Phone, MapPin, Instagram, Facebook, Link2 } from "lucide-react";
 import { HOURS_LABEL_FULL } from "@/lib/hours";
 
 const SOCIAL = {
-  instagram: "https://www.instagram.com/eldesembarcook/",
-  facebook: "https://www.facebook.com/eldesembarcoo/",
-  linktree: "https://linktr.ee/eldesembarco",
+  instagram: "https://www.instagram.com",
+  facebook: "https://www.facebook.com",
+  linktree: "https://www.linktr.ee",
 };
 
 export function SiteFooter() {
