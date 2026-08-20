@@ -22,6 +22,7 @@ export type Product = {
   categoria: Category;
   imagen: string;
   disponible: boolean;
+  variantes?: string[];
 };
 
 export const PRODUCTS: Product[] = [
@@ -31,7 +32,7 @@ export const PRODUCTS: Product[] = [
   { id: "p4", nombre: "Hamburguesa Completa", descripcion: "Doble medallón, cheddar, panceta, huevo y verdeo.", precio: 6400, categoria: "Sándwiches", imagen: hamburguesa, disponible: true },
   { id: "p5", nombre: "Sándwich de rúcula y bondiola", descripcion: "Bondiola curada, rúcula fresca y queso untado en pan artesanal.", precio: 3700, categoria: "Sándwiches", imagen: ruculaBondiolaAsset.url, disponible: true },
   { id: "p6", nombre: "Cerveza Artesanal", descripcion: "Rubia bien fría, estilo lager argentina.", precio: 2900, categoria: "Bebidas", imagen: cerveza, disponible: true },
-  { id: "p7", nombre: "Gaseosa Línea Cola", descripcion: "Botella 500ml bien helada.", precio: 2100, categoria: "Bebidas", imagen: gaseosa, disponible: true },
+  { id: "p7", nombre: "Gaseosa", descripcion: "Botella 500ml bien helada.", precio: 2100, categoria: "Bebidas", imagen: gaseosa, disponible: true, variantes: ["Coca-Cola", "Fanta", "Sprite"] },
   { id: "p8", nombre: "Combo Picada Jujeña", descripcion: "Variedad de fiambres + Bebida. Ideal para compartir.", precio: 10300, categoria: "Promos", imagen: promo, disponible: true },
 ];
 

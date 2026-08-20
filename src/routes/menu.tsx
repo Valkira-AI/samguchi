@@ -27,6 +27,7 @@ function Menu() {
   const [cartOpen, setCartOpen] = useState(false);
   const [cliente, setCliente] = useState("");
   const [waLink, setWaLink] = useState<string | null>(null);
+  const [variants, setVariants] = useState<Record<string, string>>({});
   const products = useCatalog();
   const [abierto, setAbierto] = useState(true);
 
@@ -48,10 +49,11 @@ function Menu() {
         .map(([id, cantidad]) => {
           const p = products.find((x) => x.id === id);
           if (!p) return null;
-          return { id, nombre: p.nombre, precio: p.precio, cantidad };
+          const v = p.variantes?.length ? variants[id] || p.variantes[0] : null;
+          return { id, nombre: v ? `${p.nombre} (${v})` : p.nombre, precio: p.precio, cantidad };
         })
         .filter((i): i is OrderItem => i !== null && i.cantidad > 0),
-    [cart, products],
+    [cart, products, variants],
   );
 
   const total = items.reduce((s, i) => s + i.precio * i.cantidad, 0);
@@ -166,7 +168,20 @@ function Menu() {
                   <span className="whitespace-nowrap font-semibold text-primary">{formatARS(p.precio)}</span>
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground">{p.descripcion}</p>
-                <div className="mt-4 flex items-center justify-between">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+                  {p.variantes?.length ? (
+                    <select
+                      aria-label={`Variante de ${p.nombre}`}
+                      value={variants[p.id] || p.variantes[0]}
+                      onChange={(e) => setVariants((v) => ({ ...v, [p.id]: e.target.value }))}
+                      disabled={!p.disponible}
+                      className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium outline-none focus:border-primary disabled:opacity-50"
+                    >
+                      {p.variantes.map((v) => (
+                        <option key={v} value={v}>{v}</option>
+                      ))}
+                    </select>
+                  ) : null}
                   {p.disponible && cart[p.id] ? (
                     <div className="flex items-center gap-2">
                       <button onClick={() => dec(p.id)} className="rounded-full border border-border p-2 hover:bg-muted"><Minus className="h-4 w-4" /></button>
