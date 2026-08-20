@@ -56,9 +56,9 @@ function Home() {
           <h2 className="font-display text-4xl md:text-5xl">Promos más vendidas</h2>
           <p className="mt-1 text-muted-foreground">Lo que más piden nuestros clientes.</p>
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="flex flex-wrap justify-center gap-6">
           {TOP.map((p, i) => (
-            <article key={p.id} className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:shadow-warm">
+            <article key={p.id} className="group w-full max-w-sm overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:shadow-warm">
               <div className="relative aspect-[5/4] overflow-hidden bg-muted">
                 <img src={p.imagen} alt={p.nombre} loading="lazy" width={800} height={640} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                 <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
