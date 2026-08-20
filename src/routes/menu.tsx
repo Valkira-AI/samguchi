@@ -53,7 +53,7 @@ function Menu() {
           return { id, nombre: v ? `${p.nombre} (${v})` : p.nombre, precio: p.precio, cantidad };
         })
         .filter((i): i is OrderItem => i !== null && i.cantidad > 0),
-    [cart, products],
+    [cart, products, variants],
   );
 
   const total = items.reduce((s, i) => s + i.precio * i.cantidad, 0);
