@@ -15,11 +15,11 @@ export function SiteFooter() {
         <div>
           <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Contacto</h4>
           <div className="mt-4 space-y-2">
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Phone className="h-4 w-4 text-primary" /> +54 9 388 400-0000
+            <p className="flex items-center gap-2 text-xs text-muted-foreground sm:text-sm">
+              <Phone className="h-3.5 w-3.5 text-primary sm:h-4 sm:w-4" /> +54 9 388 400-0000
             </p>
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4 text-primary" /> Av. Senador Perez 450, Jujuy
+            <p className="flex items-center gap-2 text-xs text-muted-foreground sm:text-sm">
+              <MapPin className="h-3.5 w-3.5 text-primary sm:h-4 sm:w-4" /> Av. Senador Perez 450, Jujuy
             </p>
           </div>
         </div>
