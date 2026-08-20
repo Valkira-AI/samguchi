@@ -22,6 +22,7 @@ export type Product = {
   categoria: Category;
   imagen: string;
   disponible: boolean;
+  variantes?: string[];
 };
 
 export const PRODUCTS: Product[] = [
