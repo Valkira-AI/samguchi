@@ -36,7 +36,6 @@ function Nosotros() {
           ))}
         </div>
       </section>
-      <SiteFooter />
     </div>
   );
 }

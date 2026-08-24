@@ -83,8 +83,6 @@ function Home() {
         </div>
       </section>
 
-      <SiteFooter />
-
     </div>
   );
 }

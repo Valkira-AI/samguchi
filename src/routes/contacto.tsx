@@ -48,7 +48,6 @@ function Contacto() {
           Escribinos por WhatsApp
         </a>
       </section>
-      <SiteFooter />
     </div>
   );
 }
