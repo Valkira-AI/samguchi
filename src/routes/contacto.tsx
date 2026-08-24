@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Phone, MapPin, Clock } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/contacto")({
   head: () => ({
@@ -48,7 +47,6 @@ function Contacto() {
           Escribinos por WhatsApp
         </a>
       </section>
-      <SiteFooter />
     </div>
   );
 }

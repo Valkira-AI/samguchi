@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/nosotros")({
   head: () => ({
@@ -36,7 +35,6 @@ function Nosotros() {
           ))}
         </div>
       </section>
-      <SiteFooter />
     </div>
   );
 }

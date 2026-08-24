@@ -3,7 +3,6 @@ import { formatARS } from "@/lib/products";
 import { useCatalog } from "@/lib/catalog-store";
 import heroAsset from "@/assets/hero-menu-wall.png.asset.json";
 import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 
 const hero = heroAsset.url;
 
@@ -82,8 +81,6 @@ function Home() {
           ))}
         </div>
       </section>
-
-      <SiteFooter />
 
     </div>
   );
