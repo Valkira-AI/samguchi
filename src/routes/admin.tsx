@@ -504,21 +504,126 @@ function CatalogoView() {
 }
 
 /* ---------- Reportes ---------- */
+type Periodo = "semanal" | "mensual" | "anual";
+
+const REPORTES: Record<
+  Periodo,
+  {
+    etiqueta: string;
+    rango: string;
+    ingresos: number;
+    pedidos: number;
+    ticket: number;
+    productosActivos: number;
+    crecimiento: string;
+    mejorMomento: string;
+    categoriaTop: string;
+    serieLabel: string;
+    serie: { label: string; valor: number }[];
+    topProducts: { nombre: string; uds: number; total: number }[];
+  }
+> = {
+  semanal: {
+    etiqueta: "Semanal",
+    rango: "Lun 17 – Dom 23 de agosto",
+    ingresos: 486300,
+    pedidos: 108,
+    ticket: 4503,
+    productosActivos: 12,
+    crecimiento: "+8,4% vs. semana anterior",
+    mejorMomento: "Sábado (21:30 a 23:00)",
+    categoriaTop: "Sándwiches",
+    serieLabel: "Ventas por día",
+    serie: [
+      { label: "Lun", valor: 42300 },
+      { label: "Mar", valor: 38700 },
+      { label: "Mié", valor: 51200 },
+      { label: "Jue", valor: 64800 },
+      { label: "Vie", valor: 96500 },
+      { label: "Sáb", valor: 121400 },
+      { label: "Dom", valor: 71400 },
+    ],
+    topProducts: [
+      { nombre: "Sándwich de Milanesa", uds: 34, total: 176800 },
+      { nombre: "Hamburguesa Completa", uds: 27, total: 143100 },
+      { nombre: "Choripán con Chimichurri", uds: 19, total: 79800 },
+      { nombre: "Gaseosa (Coca-Cola)", uds: 41, total: 86100 },
+    ],
+  },
+  mensual: {
+    etiqueta: "Mensual",
+    rango: "Agosto 2026",
+    ingresos: 2094500,
+    pedidos: 462,
+    ticket: 4533,
+    productosActivos: 12,
+    crecimiento: "+12,1% vs. julio",
+    mejorMomento: "Fines de semana (72% de las ventas)",
+    categoriaTop: "Sándwiches",
+    serieLabel: "Ventas por semana",
+    serie: [
+      { label: "Sem 1", valor: 448200 },
+      { label: "Sem 2", valor: 472600 },
+      { label: "Sem 3", valor: 486300 },
+      { label: "Sem 4", valor: 512900 },
+      { label: "Sem 5", valor: 174500 },
+    ],
+    topProducts: [
+      { nombre: "Sándwich de Milanesa", uds: 142, total: 738400 },
+      { nombre: "Hamburguesa Completa", uds: 118, total: 625400 },
+      { nombre: "Lomito Completo", uds: 74, total: 384800 },
+      { nombre: "Combo Picada Jujeña", uds: 38, total: 265000 },
+    ],
+  },
+  anual: {
+    etiqueta: "Anual",
+    rango: "Año 2026 (ene – ago)",
+    ingresos: 15380000,
+    pedidos: 3412,
+    ticket: 4508,
+    productosActivos: 12,
+    crecimiento: "+23,7% vs. 2025",
+    mejorMomento: "Julio (vacaciones de invierno)",
+    categoriaTop: "Sándwiches",
+    serieLabel: "Ventas por mes",
+    serie: [
+      { label: "Ene", valor: 1620000 },
+      { label: "Feb", valor: 1485000 },
+      { label: "Mar", valor: 1712000 },
+      { label: "Abr", valor: 1654000 },
+      { label: "May", valor: 1890000 },
+      { label: "Jun", valor: 1975000 },
+      { label: "Jul", valor: 2949500 },
+      { label: "Ago", valor: 2094500 },
+    ],
+    topProducts: [
+      { nombre: "Sándwich de Milanesa", uds: 1043, total: 5423600 },
+      { nombre: "Hamburguesa Completa", uds: 872, total: 4621600 },
+      { nombre: "Lomito Completo", uds: 561, total: 2917200 },
+      { nombre: "Sándwich de rúcula y bondiola", uds: 402, total: 2211000 },
+    ],
+  },
+};
+
 function ReportesView() {
-  const topProducts = [
-    { nombre: "Hamburguesa Clásica", uds: 3, total: 12600 },
-    { nombre: "Coca-Cola 500ml", uds: 3, total: 3600 },
-    { nombre: "Milanesa Completa", uds: 1, total: 4500 },
-    { nombre: "Jugo Natural", uds: 1, total: 1500 },
-  ];
+  const [periodo, setPeriodo] = useState<Periodo>("semanal");
+  const data = REPORTES[periodo];
+  const topProducts = data.topProducts;
   const maxTotal = Math.max(...topProducts.map((t) => t.total));
+  const maxSerie = Math.max(...data.serie.map((s) => s.valor));
 
   const exportExcel = () => {
     const resumen = [
-      { "Métrica": "Ingresos del día", "Valor ($)": 22200 },
-      { "Métrica": "Pedidos activos", "Valor ($)": 3 },
-      { "Métrica": "Productos activos", "Valor ($)": 12 },
+      { "Métrica": "Período", "Valor ($)": `${data.etiqueta} · ${data.rango}` },
+      { "Métrica": "Ingresos", "Valor ($)": data.ingresos },
+      { "Métrica": "Pedidos", "Valor ($)": data.pedidos },
+      { "Métrica": "Ticket promedio", "Valor ($)": data.ticket },
+      { "Métrica": "Productos activos", "Valor ($)": data.productosActivos },
+      { "Métrica": "Crecimiento", "Valor ($)": data.crecimiento },
+      { "Métrica": "Mejor momento", "Valor ($)": data.mejorMomento },
+      { "Métrica": "Categoría más vendida", "Valor ($)": data.categoriaTop },
     ];
+    const evolucion = data.serie.map((s) => ({ "Período": s.label, "Total ($)": s.valor }));
     const productos = topProducts.map((p) => ({
       "Nombre del Item": p.nombre,
       "Unidades": p.uds,
@@ -526,16 +631,19 @@ function ReportesView() {
     }));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumen), "Resumen");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(evolucion), "Evolución");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productos), "Top Productos");
-    XLSX.writeFile(wb, `sam-guchi-reporte-${new Date().toISOString().slice(0, 10)}.xlsx`);
-    toast.success("Reporte exportado");
+    XLSX.writeFile(wb, `sam-guchi-reporte-${periodo}-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    toast.success(`Reporte ${data.etiqueta.toLowerCase()} exportado`);
   };
-
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <h1 className="font-display text-2xl md:text-4xl text-foreground">REPORTES DE VENTA</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div>
+          <h1 className="font-display text-2xl md:text-4xl text-foreground">REPORTES DE VENTA</h1>
+          <p className="text-sm text-muted-foreground mt-1">{data.rango}</p>
+        </div>
         <button
           onClick={exportExcel}
           className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-warm hover:opacity-90"
@@ -544,10 +652,50 @@ function ReportesView() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <StatCard icon={<DollarSign className="h-5 w-5 text-emerald-600" />} bg="bg-emerald-50" label="Ingresos del día" value="$22.200" />
-        <StatCard icon={<LayoutGrid className="h-5 w-5 text-blue-600" />} bg="bg-blue-50" label="Pedidos activos" value="3" />
-        <StatCard icon={<Package className="h-5 w-5 text-purple-600" />} bg="bg-purple-50" label="Productos activos" value="12" />
+      <div className="mb-6 inline-flex rounded-full bg-muted p-1">
+        {(["semanal", "mensual", "anual"] as Periodo[]).map((p) => (
+          <button
+            key={p}
+            onClick={() => setPeriodo(p)}
+            className={`rounded-full px-4 py-1.5 text-sm font-semibold capitalize transition ${
+              periodo === p ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {p}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <StatCard icon={<DollarSign className="h-5 w-5 text-emerald-600" />} bg="bg-emerald-50" label="Ingresos" value={formatARS(data.ingresos)} />
+        <StatCard icon={<LayoutGrid className="h-5 w-5 text-blue-600" />} bg="bg-blue-50" label="Pedidos" value={String(data.pedidos)} />
+        <StatCard icon={<BarChart3 className="h-5 w-5 text-amber-600" />} bg="bg-amber-50" label="Ticket promedio" value={formatARS(data.ticket)} />
+        <StatCard icon={<Package className="h-5 w-5 text-purple-600" />} bg="bg-purple-50" label="Productos activos" value={String(data.productosActivos)} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+        <InfoCard label="Crecimiento" value={data.crecimiento} />
+        <InfoCard label="Mejor momento de venta" value={data.mejorMomento} />
+        <InfoCard label="Categoría más vendida" value={data.categoriaTop} />
+      </div>
+
+      <div className="rounded-2xl bg-card border border-border p-6 mb-6">
+        <h2 className="font-display text-2xl mb-6">{data.serieLabel.toUpperCase()}</h2>
+        <div className="flex items-end gap-2 sm:gap-4 h-48">
+          {data.serie.map((s) => (
+            <div key={s.label} className="flex-1 flex flex-col items-center justify-end h-full gap-2">
+              <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">
+                {Math.round(s.valor / 1000)}k
+              </span>
+              <div
+                className="w-full rounded-t-md bg-primary/80 hover:bg-primary transition-all"
+                style={{ height: `${(s.valor / maxSerie) * 100}%` }}
+                title={`${s.label}: ${formatARS(s.valor)}`}
+              />
+              <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground">{s.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="rounded-2xl bg-card border border-border p-6">
@@ -557,9 +705,9 @@ function ReportesView() {
             <li key={p.nombre} className="flex items-center gap-4">
               <span className="font-display text-2xl text-muted-foreground w-6">{i + 1}</span>
               <div className="flex-1">
-                <div className="flex items-baseline justify-between mb-1">
+                <div className="flex items-baseline justify-between mb-1 gap-2">
                   <span className="font-semibold">{p.nombre}</span>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-sm text-muted-foreground whitespace-nowrap">
                     {p.uds} uds. <span className="ml-3 font-display text-lg text-primary">{formatARS(p.total)}</span>
                   </span>
                 </div>
@@ -574,6 +722,16 @@ function ReportesView() {
     </div>
   );
 }
+
+function InfoCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl bg-card border border-border p-5">
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-2 font-semibold text-foreground">{value}</p>
+    </div>
+  );
+}
+
 
 function StatCard({ icon, bg, label, value }: { icon: React.ReactNode; bg: string; label: string; value: string }) {
   return (
