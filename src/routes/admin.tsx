@@ -681,7 +681,7 @@ function ReportesView() {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumen), "Resumen");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(evolucion), "Evolución");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productos), "Top Productos");
-    XLSX.writeFile(wb, `sam-guchi-reporte-${periodo}-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    XLSX.writeFile(wb, `sam-guchi-reporte-${periodo}-${opcion.id}-${new Date().toISOString().slice(0, 10)}.xlsx`);
     toast.success(`Reporte ${data.etiqueta.toLowerCase()} exportado`);
   };
 
