@@ -605,12 +605,60 @@ const REPORTES: Record<
   },
 };
 
+type Opcion = { id: string; label: string; rango: string; factor: number; crecimiento: string; mejorMomento: string };
+
+const OPCIONES: Record<Periodo, Opcion[]> = {
+  semanal: [
+    { id: "s34", label: "Semana 17 – 23 ago", rango: "Lun 17 – Dom 23 de agosto", factor: 1, crecimiento: "+8,4% vs. semana anterior", mejorMomento: "Sábado (21:30 a 23:00)" },
+    { id: "s33", label: "Semana 10 – 16 ago", rango: "Lun 10 – Dom 16 de agosto", factor: 0.92, crecimiento: "+3,1% vs. semana anterior", mejorMomento: "Viernes (21:00 a 22:30)" },
+    { id: "s32", label: "Semana 3 – 9 ago", rango: "Lun 3 – Dom 9 de agosto", factor: 0.86, crecimiento: "-1,8% vs. semana anterior", mejorMomento: "Sábado (22:00 a 23:30)" },
+  ],
+  mensual: [
+    { id: "m8", label: "Agosto 2026", rango: "Agosto 2026", factor: 1, crecimiento: "+12,1% vs. julio", mejorMomento: "Fines de semana (72% de las ventas)" },
+    { id: "m7", label: "Julio 2026", rango: "Julio 2026", factor: 1.41, crecimiento: "+49,4% vs. junio", mejorMomento: "Vacaciones de invierno (todas las noches)" },
+    { id: "m6", label: "Junio 2026", rango: "Junio 2026", factor: 0.94, crecimiento: "+4,5% vs. mayo", mejorMomento: "Fines de semana (68% de las ventas)" },
+  ],
+  anual: [
+    { id: "a2026", label: "Año 2026", rango: "Año 2026 (ene – ago)", factor: 1, crecimiento: "+23,7% vs. 2025", mejorMomento: "Julio (vacaciones de invierno)" },
+    { id: "a2025", label: "Año 2025", rango: "Año 2025 (completo)", factor: 0.81, crecimiento: "+15,2% vs. 2024", mejorMomento: "Julio (vacaciones de invierno)" },
+    { id: "a2024", label: "Año 2024", rango: "Año 2024 (completo)", factor: 0.7, crecimiento: "+9,6% vs. 2023", mejorMomento: "Diciembre (fiestas)" },
+  ],
+};
+
 function ReportesView() {
   const [periodo, setPeriodo] = useState<Periodo>("semanal");
-  const data = REPORTES[periodo];
+  const [opcionId, setOpcionId] = useState<string>(OPCIONES.semanal[0].id);
+
+  const opciones = OPCIONES[periodo];
+  const opcion = opciones.find((o) => o.id === opcionId) ?? opciones[0];
+  const f = opcion.factor;
+  const base = REPORTES[periodo];
+
+  const cambiarPeriodo = (p: Periodo) => {
+    setPeriodo(p);
+    setOpcionId(OPCIONES[p][0].id);
+  };
+
+  const data = {
+    ...base,
+    rango: opcion.rango,
+    crecimiento: opcion.crecimiento,
+    mejorMomento: opcion.mejorMomento,
+    ingresos: Math.round((base.ingresos * f) / 100) * 100,
+    pedidos: Math.round(base.pedidos * f),
+    ticket: Math.round(base.ticket * (0.97 + f * 0.03)),
+    serie: base.serie.map((s) => ({ ...s, valor: Math.round((s.valor * f) / 100) * 100 })),
+    topProducts: base.topProducts.map((p) => ({
+      ...p,
+      uds: Math.round(p.uds * f),
+      total: Math.round((p.total * f) / 100) * 100,
+    })),
+  };
+
   const topProducts = data.topProducts;
   const maxTotal = Math.max(...topProducts.map((t) => t.total));
   const maxSerie = Math.max(...data.serie.map((s) => s.valor));
+
 
   const exportExcel = () => {
     const resumen = [
@@ -633,7 +681,7 @@ function ReportesView() {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumen), "Resumen");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(evolucion), "Evolución");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productos), "Top Productos");
-    XLSX.writeFile(wb, `sam-guchi-reporte-${periodo}-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    XLSX.writeFile(wb, `sam-guchi-reporte-${periodo}-${opcion.id}-${new Date().toISOString().slice(0, 10)}.xlsx`);
     toast.success(`Reporte ${data.etiqueta.toLowerCase()} exportado`);
   };
 
