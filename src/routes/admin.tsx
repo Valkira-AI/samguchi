@@ -700,19 +700,37 @@ function ReportesView() {
         </button>
       </div>
 
-      <div className="mb-6 inline-flex rounded-full bg-muted p-1">
-        {(["semanal", "mensual", "anual"] as Periodo[]).map((p) => (
-          <button
-            key={p}
-            onClick={() => setPeriodo(p)}
-            className={`rounded-full px-4 py-1.5 text-sm font-semibold capitalize transition ${
-              periodo === p ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-            }`}
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <div className="inline-flex rounded-full bg-muted p-1">
+          {(["semanal", "mensual", "anual"] as Periodo[]).map((p) => (
+            <button
+              key={p}
+              onClick={() => cambiarPeriodo(p)}
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold capitalize transition ${
+                periodo === p ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+
+        <label className="inline-flex items-center gap-2 text-sm">
+          <span className="text-muted-foreground">Período:</span>
+          <select
+            value={opcion.id}
+            onChange={(e) => setOpcionId(e.target.value)}
+            className="rounded-full border border-border bg-card px-3 py-1.5 text-sm font-semibold text-foreground"
           >
-            {p}
-          </button>
-        ))}
+            {opciones.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
+
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard icon={<DollarSign className="h-5 w-5 text-emerald-600" />} bg="bg-emerald-50" label="Ingresos" value={formatARS(data.ingresos)} />
