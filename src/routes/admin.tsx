@@ -289,22 +289,22 @@ function PedidosView() {
       <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {STAGES.map((s) => {
           const Icon = s.icon;
-          const列 = demoList.filter((o) => o.estado === s.id);
+          const col = demoList.filter((o) => o.estado === s.id);
           return (
             <div key={s.id} className="rounded-2xl border border-border bg-muted/40 p-3">
               <div className="mb-3 flex items-center gap-2">
                 <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[s.id]}`}>
                   <Icon className="h-3.5 w-3.5" /> {s.label}
                 </span>
-                <span className="ml-auto text-xs text-muted-foreground">{列.length}</span>
+                <span className="ml-auto text-xs text-muted-foreground">{col.length}</span>
               </div>
               <div className="space-y-3">
-                {列.length === 0 && (
+                {col.length === 0 && (
                   <p className="rounded-xl border border-dashed border-border py-6 text-center text-xs text-muted-foreground">
                     Sin pedidos
                   </p>
                 )}
-                {列.map((o) => {
+                {col.map((o) => {
                   const next = NEXT_STATE[o.estado];
                   const step = STAGES.findIndex((x) => x.id === o.estado) + 1;
                   return (
