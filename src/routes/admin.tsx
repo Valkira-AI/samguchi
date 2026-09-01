@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock, Plus, Trash2 } from "lucide-react";
+import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock, Plus, Trash2, Inbox, ChefHat, Bike, CheckCircle2 } from "lucide-react";
 import { updateOrderState, useOrders, type Order } from "@/lib/orders-store";
 import { formatARS, CATEGORIES, type Product, type Category } from "@/lib/products";
 import { useCatalog, updateProduct, setProductAvailability, createProduct, deleteProduct } from "@/lib/catalog-store";
@@ -53,6 +53,14 @@ const ESTADO_STYLES: Record<Order["estado"], string> = {
   Despachado: "bg-orange-100 text-orange-800 border-orange-300",
   Finalizado: "bg-emerald-100 text-emerald-800 border-emerald-300",
 };
+
+const STAGES: { id: Order["estado"]; label: string; icon: typeof Inbox }[] = [
+  { id: "Nuevo", label: "Nuevo", icon: Inbox },
+  { id: "En Preparación", label: "En Preparación", icon: ChefHat },
+  { id: "Despachado", label: "Despachado", icon: Bike },
+  { id: "Finalizado", label: "Finalizado", icon: CheckCircle2 },
+];
+
 
 function Admin() {
   const check = useServerFn(checkAdminSession);
@@ -234,6 +242,9 @@ function PedidosView() {
       Finalizado: all.filter((e) => e === "Finalizado").length,
     };
   }, [demoList, realOrders]);
+  const totalPipeline = counts.Nuevo + counts["En Preparación"] + counts.Despachado + counts.Finalizado;
+
+
 
   const advanceDemo = (id: string) => {
     setDemoStates((s) => {
@@ -251,48 +262,115 @@ function PedidosView() {
         Horario de pedidos: {HOURS_LABEL} hs
       </p>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {(Object.keys(counts) as Order["estado"][]).map((e) => (
-          <div key={e} className="rounded-2xl bg-card p-5 border border-border">
-            <span className={`inline-block rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[e]}`}>{e}</span>
-            <p className="mt-4 font-display text-2xl md:text-4xl">{counts[e]}</p>
-            <p className="text-xs text-muted-foreground">pedidos</p>
-          </div>
-        ))}
+      {/* Línea de producción */}
+      <div className="mb-8 overflow-x-auto">
+        <div className="flex min-w-[640px] items-stretch gap-2">
+          {STAGES.map((s, i) => {
+            const Icon = s.icon;
+            const active = counts[s.id] > 0;
+            return (
+              <div key={s.id} className="flex flex-1 items-center gap-2">
+                <div
+                  className={`flex-1 rounded-2xl border p-4 transition ${
+                    active ? `${ESTADO_STYLES[s.id]} shadow-sm` : "border-border bg-card text-muted-foreground"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <Icon className={`h-5 w-5 ${active ? "" : "opacity-50"}`} />
+                    <span className="font-display text-2xl leading-none">{counts[s.id]}</span>
+                  </div>
+                  <p className="mt-2 text-xs font-semibold uppercase tracking-wide">{s.label}</p>
+                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-foreground/10">
+                    <div
+                      className="h-full rounded-full bg-current transition-all"
+                      style={{ width: `${totalPipeline ? (counts[s.id] / totalPipeline) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+                {i < STAGES.length - 1 && (
+                  <ChevronRight className={`h-5 w-5 shrink-0 ${active ? "text-primary" : "text-muted-foreground/40"}`} />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="space-y-4">
-        {demoList.map((o) => {
-          const next = NEXT_STATE[o.estado];
+      {/* Tablero de trayectoria */}
+      <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {STAGES.map((s) => {
+          const Icon = s.icon;
+          const col = demoList.filter((o) => o.estado === s.id);
           return (
-            <div key={o.id} className="rounded-2xl bg-card border border-border p-5">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-3 mb-3">
-                    <span className="font-display text-2xl">{o.id}</span>
-                    <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[o.estado]}`}>{o.estado}</span>
-                    <span className="flex items-center gap-1 text-sm text-muted-foreground"><User className="h-3.5 w-3.5" />{o.cliente}</span>
-                  </div>
-                  <ul className="text-sm text-muted-foreground space-y-0.5">
-                    {o.items.map((i, idx) => <li key={idx}>{i.cant}× {i.nombre}</li>)}
-                  </ul>
-                  <p className="mt-3 font-display text-2xl text-primary">{formatARS(o.total)}</p>
-                </div>
-                <div className="flex flex-col items-end gap-3">
-                  <span className="text-sm text-muted-foreground">{o.hora}</span>
-                  {next && (
-                    <button
-                      onClick={() => advanceDemo(o.id)}
-                      className="inline-flex items-center gap-1 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
-                    >
-                      <ChevronRight className="h-4 w-4" /> {next}
-                    </button>
-                  )}
-                </div>
+            <div key={s.id} className="rounded-2xl border border-border bg-muted/40 p-3">
+              <div className="mb-3 flex items-center gap-2">
+                <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[s.id]}`}>
+                  <Icon className="h-3.5 w-3.5" /> {s.label}
+                </span>
+                <span className="ml-auto text-xs text-muted-foreground">{col.length}</span>
+              </div>
+              <div className="space-y-3">
+                {col.length === 0 && (
+                  <p className="rounded-xl border border-dashed border-border py-6 text-center text-xs text-muted-foreground">
+                    Sin pedidos
+                  </p>
+                )}
+                {col.map((o) => {
+                  const next = NEXT_STATE[o.estado];
+                  const step = STAGES.findIndex((x) => x.id === o.estado) + 1;
+                  return (
+                    <div key={o.id} className="rounded-xl border border-border bg-card p-4">
+                      <div className="flex items-center justify-between">
+                        <span className="font-display text-xl">{o.id}</span>
+                        <span className="text-xs text-muted-foreground">{o.hora}</span>
+                      </div>
+                      <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
+                        <User className="h-3.5 w-3.5" />
+                        {o.cliente}
+                      </p>
+                      <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
+                        {o.items.map((i, idx) => (
+                          <li key={idx}>
+                            {i.cant}× {i.nombre}
+                          </li>
+                        ))}
+                      </ul>
+                      {/* mini trayectoria */}
+                      <div className="mt-3 flex items-center gap-1">
+                        {STAGES.map((st, idx) => (
+                          <div key={st.id} className="flex flex-1 items-center gap-1">
+                            <span
+                              className={`h-2 w-2 shrink-0 rounded-full ${idx < step ? "bg-primary" : "bg-border"}`}
+                            />
+                            {idx < STAGES.length - 1 && (
+                              <span className={`h-0.5 flex-1 rounded-full ${idx < step - 1 ? "bg-primary" : "bg-border"}`} />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      <p className="mt-1 text-[11px] text-muted-foreground">Etapa {step} de {STAGES.length}</p>
+                      <div className="mt-3 flex items-center justify-between gap-2">
+                        <span className="font-display text-lg text-primary">{formatARS(o.total)}</span>
+                        {next && (
+                          <button
+                            onClick={() => advanceDemo(o.id)}
+                            className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90"
+                          >
+                            {next} <ChevronRight className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );
         })}
+      </div>
+
+      <div className="space-y-4">
+
 
         {realOrders.length > 0 && (
           <>
