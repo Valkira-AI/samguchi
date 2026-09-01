@@ -242,6 +242,9 @@ function PedidosView() {
       Finalizado: all.filter((e) => e === "Finalizado").length,
     };
   }, [demoList, realOrders]);
+  const totalPipeline = counts.Nuevo + counts["En Preparación"] + counts.Despachado + counts.Finalizado;
+
+
 
   const advanceDemo = (id: string) => {
     setDemoStates((s) => {
