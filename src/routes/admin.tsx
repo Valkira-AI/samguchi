@@ -54,6 +54,14 @@ const ESTADO_STYLES: Record<Order["estado"], string> = {
   Finalizado: "bg-emerald-100 text-emerald-800 border-emerald-300",
 };
 
+const STAGES: { id: Order["estado"]; label: string; icon: typeof Inbox }[] = [
+  { id: "Nuevo", label: "Nuevo", icon: Inbox },
+  { id: "En Preparación", label: "En Preparación", icon: ChefHat },
+  { id: "Despachado", label: "Despachado", icon: Bike },
+  { id: "Finalizado", label: "Finalizado", icon: CheckCircle2 },
+];
+
+
 function Admin() {
   const check = useServerFn(checkAdminSession);
   const unlock = useServerFn(unlockAdmin);
