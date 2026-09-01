@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Phone, MapPin, Clock, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
 
@@ -55,24 +55,6 @@ function Contacto() {
       <section className="mx-auto max-w-4xl px-4 py-14">
         <h1 className="font-display text-4xl text-primary md:text-5xl">Contacto</h1>
         <p className="mt-3 text-muted-foreground">Escribinos y armamos tu pedido al toque.</p>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <Phone className="h-5 w-5 text-primary" />
-            <h2 className="mt-3 font-semibold">Teléfono</h2>
-            <p className="mt-1 text-sm text-muted-foreground">+54 9 388 400-0000</p>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <MapPin className="h-5 w-5 text-primary" />
-            <h2 className="mt-3 font-semibold">Dirección</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Av. Senador Perez 450, Jujuy</p>
-          </div>
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <Clock className="h-5 w-5 text-primary" />
-            <h2 className="mt-3 font-semibold">Horarios</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Lun a Dom · 20:00 a 00:30</p>
-          </div>
-        </div>
 
         <form
           onSubmit={handleSubmit}
