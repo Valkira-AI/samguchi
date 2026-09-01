@@ -152,7 +152,7 @@ function Admin() {
       </div>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-60 shrink-0 bg-[#1a1a1a] text-white flex-col">
+      <aside className="hidden md:flex w-60 shrink-0 bg-[#1a1a1a] text-white flex-col fixed inset-y-0 left-0 z-40 overflow-y-auto">
         <div className="px-6 py-6 border-b border-white/10">
           <h1 className="font-display text-2xl text-[oklch(0.78_0.17_75)] leading-none">SAM GUCHI</h1>
           <p className="text-xs text-white/60 mt-1">Panel Admin</p>
@@ -172,7 +172,7 @@ function Admin() {
         </div>
       </aside>
 
-      <main className="flex-1 min-w-0 px-4 py-6 md:px-10 md:py-8">
+      <main className="flex-1 min-w-0 px-4 py-6 md:px-10 md:py-8 md:ml-60">
         {section === "pedidos" && <PedidosView />}
         {section === "catalogo" && <CatalogoView />}
         {section === "reportes" && <ReportesView />}
