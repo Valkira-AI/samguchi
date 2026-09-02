@@ -371,7 +371,7 @@ function PedidosView() {
                 setOverStage(null);
                 const id = dragId ?? e.dataTransfer.getData("text/plain");
                 const card = boardCards.find((c) => c.id === id);
-                if (card) moveCard(card, s.id);
+                if (card && card.estado !== "finalizado") moveCard(card, s.id);
                 setDragId(null);
               }}
               className={`rounded-2xl border p-3 transition ${
