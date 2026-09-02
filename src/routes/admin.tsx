@@ -352,13 +352,32 @@ function PedidosView() {
         </div>
       </div>
 
-      {/* Tablero de trayectoria */}
+      {/* Tablero de trayectoria (arrastrable) */}
+      <p className="mb-2 text-xs text-muted-foreground">Arrastrá las tarjetas entre columnas para cambiar su estado.</p>
       <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {STAGES.map((s) => {
           const Icon = s.icon;
-          const col = demoList.filter((o) => o.estado === s.id);
+          const col = boardCards.filter((o) => o.estado === s.id);
           return (
-            <div key={s.id} className="rounded-2xl border border-border bg-muted/40 p-3">
+            <div
+              key={s.id}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setOverStage(s.id);
+              }}
+              onDragLeave={() => setOverStage((cur) => (cur === s.id ? null : cur))}
+              onDrop={(e) => {
+                e.preventDefault();
+                setOverStage(null);
+                const id = dragId ?? e.dataTransfer.getData("text/plain");
+                const card = boardCards.find((c) => c.id === id);
+                if (card) moveCard(card, s.id);
+                setDragId(null);
+              }}
+              className={`rounded-2xl border p-3 transition ${
+                overStage === s.id ? "border-primary bg-primary/10" : "border-border bg-muted/40"
+              }`}
+            >
               <div className="mb-3 flex items-center gap-2">
                 <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[s.id]}`}>
                   <Icon className="h-3.5 w-3.5" /> {s.label}
@@ -375,7 +394,23 @@ function PedidosView() {
                   const next = NEXT_STATE[o.estado];
                   const step = STAGES.findIndex((x) => x.id === o.estado) + 1;
                   return (
-                    <div key={o.id} className="rounded-xl border border-border bg-card p-4">
+                    <div
+                      key={o.id}
+                      draggable
+                      onDragStart={(e) => {
+                        setDragId(o.id);
+                        e.dataTransfer.setData("text/plain", o.id);
+                        e.dataTransfer.effectAllowed = "move";
+                      }}
+                      onDragEnd={() => {
+                        setDragId(null);
+                        setOverStage(null);
+                      }}
+                      className={`cursor-grab rounded-xl border border-border bg-card p-4 active:cursor-grabbing ${
+                        dragId === o.id ? "opacity-50" : ""
+                      }`}
+                    >
+
                       <div className="flex items-center justify-between">
                         <span className="font-display text-xl">{o.id}</span>
                         <span className="text-xs text-muted-foreground">{o.hora}</span>
