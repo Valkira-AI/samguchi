@@ -219,6 +219,8 @@ function NavBtn({ icon: Icon, label, active, onClick }: { icon: typeof LayoutGri
 }
 
 /* ---------- Pedidos ---------- */
+const DEMO_STATES_KEY = "samguchi_demo_states_v1";
+
 function PedidosView() {
   const allOrders = useOrders();
   const realOrders = useMemo(
@@ -228,32 +230,86 @@ function PedidosView() {
   const [demoStates, setDemoStates] = useState<Record<string, Order["estado"]>>(
     () => Object.fromEntries(DEMO_ORDERS.map((o) => [o.id, o.estado])),
   );
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [overStage, setOverStage] = useState<Order["estado"] | null>(null);
 
-  const demoList = DEMO_ORDERS.map((o) => ({ ...o, estado: demoStates[o.id] }));
+  // Rehidratar estados guardados
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(DEMO_STATES_KEY) || "null");
+      if (saved && typeof saved === "object") {
+        setDemoStates((s) => ({ ...s, ...saved }));
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const persistDemo = (next: Record<string, Order["estado"]>) => {
+    setDemoStates(next);
+    try {
+      localStorage.setItem(DEMO_STATES_KEY, JSON.stringify(next));
+    } catch {
+      /* ignore */
+    }
+  };
+
+  type BoardCard = {
+    id: string;
+    estado: Order["estado"];
+    cliente: string;
+    hora: string;
+    total: number;
+    items: { cant: number; nombre: string }[];
+    real: boolean;
+  };
+
+  const demoList: BoardCard[] = DEMO_ORDERS.map((o) => ({
+    ...o,
+    estado: demoStates[o.id] ?? o.estado,
+    real: false,
+  }));
+
+  const realCards: BoardCard[] = realOrders.map((o) => ({
+    id: o.id,
+    estado: o.estado,
+    cliente: o.cliente,
+    hora: new Date(o.fecha).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) + " hs",
+    total: o.total,
+    items: o.items.map((i) => ({ cant: i.cantidad, nombre: i.nombre })),
+    real: true,
+  }));
+
+  const boardCards = [...realCards, ...demoList];
+
   const counts = useMemo(() => {
-    const all = [
-      ...demoList.map((d) => d.estado),
-      ...realOrders.map((r) => r.estado),
-    ];
+    const all = boardCards.map((c) => c.estado);
     return {
       Nuevo: all.filter((e) => e === "Nuevo").length,
       "En Preparación": all.filter((e) => e === "En Preparación").length,
       Despachado: all.filter((e) => e === "Despachado").length,
       Finalizado: all.filter((e) => e === "Finalizado").length,
     };
-  }, [demoList, realOrders]);
+  }, [boardCards]);
   const totalPipeline = counts.Nuevo + counts["En Preparación"] + counts.Despachado + counts.Finalizado;
 
-
+  const moveCard = (card: BoardCard, estado: Order["estado"]) => {
+    if (card.estado === estado) return;
+    if (card.real) {
+      updateOrderState(card.id, estado);
+    } else {
+      persistDemo({ ...demoStates, [card.id]: estado });
+    }
+    toast.success(`${card.id} → ${estado}`);
+  };
 
   const advanceDemo = (id: string) => {
-    setDemoStates((s) => {
-      const next = NEXT_STATE[s[id]];
-      if (!next) return s;
-      return { ...s, [id]: next };
-    });
-    toast.success("Estado actualizado");
+    const card = boardCards.find((c) => c.id === id);
+    if (!card) return;
+    const next = NEXT_STATE[card.estado];
+    if (next) moveCard(card, next);
   };
+
 
   return (
     <div>
@@ -296,13 +352,32 @@ function PedidosView() {
         </div>
       </div>
 
-      {/* Tablero de trayectoria */}
+      {/* Tablero de trayectoria (arrastrable) */}
+      <p className="mb-2 text-xs text-muted-foreground">Arrastrá las tarjetas entre columnas para cambiar su estado.</p>
       <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {STAGES.map((s) => {
           const Icon = s.icon;
-          const col = demoList.filter((o) => o.estado === s.id);
+          const col = boardCards.filter((o) => o.estado === s.id);
           return (
-            <div key={s.id} className="rounded-2xl border border-border bg-muted/40 p-3">
+            <div
+              key={s.id}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setOverStage(s.id);
+              }}
+              onDragLeave={() => setOverStage((cur) => (cur === s.id ? null : cur))}
+              onDrop={(e) => {
+                e.preventDefault();
+                setOverStage(null);
+                const id = dragId ?? e.dataTransfer.getData("text/plain");
+                const card = boardCards.find((c) => c.id === id);
+                if (card) moveCard(card, s.id);
+                setDragId(null);
+              }}
+              className={`rounded-2xl border p-3 transition ${
+                overStage === s.id ? "border-primary bg-primary/10" : "border-border bg-muted/40"
+              }`}
+            >
               <div className="mb-3 flex items-center gap-2">
                 <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[s.id]}`}>
                   <Icon className="h-3.5 w-3.5" /> {s.label}
@@ -319,7 +394,23 @@ function PedidosView() {
                   const next = NEXT_STATE[o.estado];
                   const step = STAGES.findIndex((x) => x.id === o.estado) + 1;
                   return (
-                    <div key={o.id} className="rounded-xl border border-border bg-card p-4">
+                    <div
+                      key={o.id}
+                      draggable
+                      onDragStart={(e) => {
+                        setDragId(o.id);
+                        e.dataTransfer.setData("text/plain", o.id);
+                        e.dataTransfer.effectAllowed = "move";
+                      }}
+                      onDragEnd={() => {
+                        setDragId(null);
+                        setOverStage(null);
+                      }}
+                      className={`cursor-grab rounded-xl border border-border bg-card p-4 active:cursor-grabbing ${
+                        dragId === o.id ? "opacity-50" : ""
+                      }`}
+                    >
+
                       <div className="flex items-center justify-between">
                         <span className="font-display text-xl">{o.id}</span>
                         <span className="text-xs text-muted-foreground">{o.hora}</span>
