@@ -219,6 +219,8 @@ function NavBtn({ icon: Icon, label, active, onClick }: { icon: typeof LayoutGri
 }
 
 /* ---------- Pedidos ---------- */
+const DEMO_STATES_KEY = "samguchi_demo_states_v1";
+
 function PedidosView() {
   const allOrders = useOrders();
   const realOrders = useMemo(
@@ -228,32 +230,86 @@ function PedidosView() {
   const [demoStates, setDemoStates] = useState<Record<string, Order["estado"]>>(
     () => Object.fromEntries(DEMO_ORDERS.map((o) => [o.id, o.estado])),
   );
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [overStage, setOverStage] = useState<Order["estado"] | null>(null);
 
-  const demoList = DEMO_ORDERS.map((o) => ({ ...o, estado: demoStates[o.id] }));
+  // Rehidratar estados guardados
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(DEMO_STATES_KEY) || "null");
+      if (saved && typeof saved === "object") {
+        setDemoStates((s) => ({ ...s, ...saved }));
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const persistDemo = (next: Record<string, Order["estado"]>) => {
+    setDemoStates(next);
+    try {
+      localStorage.setItem(DEMO_STATES_KEY, JSON.stringify(next));
+    } catch {
+      /* ignore */
+    }
+  };
+
+  type BoardCard = {
+    id: string;
+    estado: Order["estado"];
+    cliente: string;
+    hora: string;
+    total: number;
+    items: { cant: number; nombre: string }[];
+    real: boolean;
+  };
+
+  const demoList: BoardCard[] = DEMO_ORDERS.map((o) => ({
+    ...o,
+    estado: demoStates[o.id] ?? o.estado,
+    real: false,
+  }));
+
+  const realCards: BoardCard[] = realOrders.map((o) => ({
+    id: o.id,
+    estado: o.estado,
+    cliente: o.cliente,
+    hora: new Date(o.fecha).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) + " hs",
+    total: o.total,
+    items: o.items.map((i) => ({ cant: i.cantidad, nombre: i.nombre })),
+    real: true,
+  }));
+
+  const boardCards = [...realCards, ...demoList];
+
   const counts = useMemo(() => {
-    const all = [
-      ...demoList.map((d) => d.estado),
-      ...realOrders.map((r) => r.estado),
-    ];
+    const all = boardCards.map((c) => c.estado);
     return {
       Nuevo: all.filter((e) => e === "Nuevo").length,
       "En Preparación": all.filter((e) => e === "En Preparación").length,
       Despachado: all.filter((e) => e === "Despachado").length,
       Finalizado: all.filter((e) => e === "Finalizado").length,
     };
-  }, [demoList, realOrders]);
+  }, [boardCards]);
   const totalPipeline = counts.Nuevo + counts["En Preparación"] + counts.Despachado + counts.Finalizado;
 
-
+  const moveCard = (card: BoardCard, estado: Order["estado"]) => {
+    if (card.estado === estado) return;
+    if (card.real) {
+      updateOrderState(card.id, estado);
+    } else {
+      persistDemo({ ...demoStates, [card.id]: estado });
+    }
+    toast.success(`${card.id} → ${estado}`);
+  };
 
   const advanceDemo = (id: string) => {
-    setDemoStates((s) => {
-      const next = NEXT_STATE[s[id]];
-      if (!next) return s;
-      return { ...s, [id]: next };
-    });
-    toast.success("Estado actualizado");
+    const card = boardCards.find((c) => c.id === id);
+    if (!card) return;
+    const next = NEXT_STATE[card.estado];
+    if (next) moveCard(card, next);
   };
+
 
   return (
     <div>
