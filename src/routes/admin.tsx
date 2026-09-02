@@ -371,7 +371,7 @@ function PedidosView() {
                 setOverStage(null);
                 const id = dragId ?? e.dataTransfer.getData("text/plain");
                 const card = boardCards.find((c) => c.id === id);
-                if (card) moveCard(card, s.id);
+                if (card && card.estado !== "Finalizado") moveCard(card, s.id);
                 setDragId(null);
               }}
               className={`rounded-2xl border p-3 transition ${
@@ -396,8 +396,12 @@ function PedidosView() {
                   return (
                     <div
                       key={o.id}
-                      draggable
+                      draggable={o.estado !== "Finalizado"}
                       onDragStart={(e) => {
+                        if (o.estado === "Finalizado") {
+                          e.preventDefault();
+                          return;
+                        }
                         setDragId(o.id);
                         e.dataTransfer.setData("text/plain", o.id);
                         e.dataTransfer.effectAllowed = "move";
@@ -406,9 +410,9 @@ function PedidosView() {
                         setDragId(null);
                         setOverStage(null);
                       }}
-                      className={`cursor-grab rounded-xl border border-border bg-card p-4 active:cursor-grabbing ${
-                        dragId === o.id ? "opacity-50" : ""
-                      }`}
+                      className={`rounded-xl border border-border bg-card p-4 ${
+                        o.estado === "Finalizado" ? "cursor-default opacity-90" : "cursor-grab active:cursor-grabbing"
+                      } ${dragId === o.id ? "opacity-50" : ""}`}
                     >
 
                       <div className="flex items-center justify-between">
