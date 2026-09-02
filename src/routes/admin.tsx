@@ -396,8 +396,12 @@ function PedidosView() {
                   return (
                     <div
                       key={o.id}
-                      draggable
+                      draggable={o.estado !== "Finalizado"}
                       onDragStart={(e) => {
+                        if (o.estado === "Finalizado") {
+                          e.preventDefault();
+                          return;
+                        }
                         setDragId(o.id);
                         e.dataTransfer.setData("text/plain", o.id);
                         e.dataTransfer.effectAllowed = "move";
@@ -406,9 +410,9 @@ function PedidosView() {
                         setDragId(null);
                         setOverStage(null);
                       }}
-                      className={`cursor-grab rounded-xl border border-border bg-card p-4 active:cursor-grabbing ${
-                        dragId === o.id ? "opacity-50" : ""
-                      }`}
+                      className={`rounded-xl border border-border bg-card p-4 ${
+                        o.estado === "Finalizado" ? "cursor-default opacity-90" : "cursor-grab active:cursor-grabbing"
+                      } ${dragId === o.id ? "opacity-50" : ""}`}
                     >
 
                       <div className="flex items-center justify-between">
