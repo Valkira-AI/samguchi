@@ -3,11 +3,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock, Plus, Trash2, Inbox, ChefHat, Bike, CheckCircle2 } from "lucide-react";
+import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock, Plus, Trash2, Inbox, ChefHat, Bike, CheckCircle2, Gauge } from "lucide-react";
 import { updateOrderState, useOrders, type Order } from "@/lib/orders-store";
 import { formatARS, CATEGORIES, type Product, type Category } from "@/lib/products";
 import { useCatalog, updateProduct, setProductAvailability, createProduct, deleteProduct } from "@/lib/catalog-store";
 import { checkAdminSession, unlockAdmin, lockAdmin } from "@/lib/admin-gate.functions";
+import DashboardView from "@/components/admin/DashboardView";
 import { HOURS_LABEL, isOrderInServiceHours } from "@/lib/hours";
 
 export const Route = createFileRoute("/admin")({
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-type Section = "pedidos" | "catalogo" | "reportes";
+type Section = "dashboard" | "pedidos" | "catalogo" | "reportes";
 
 
 /* ---------- demo prototype data ---------- */
@@ -70,7 +71,7 @@ function Admin() {
   const [pwd, setPwd] = useState("");
   const [error, setError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [section, setSection] = useState<Section>("pedidos");
+  const [section, setSection] = useState<Section>("dashboard");
 
   useEffect(() => {
     check().then((r) => setAuthed(r.unlocked)).catch(() => setAuthed(false));
@@ -153,6 +154,7 @@ function Admin() {
           </button>
         </div>
         <nav className="flex px-2 py-2 gap-1 overflow-x-auto">
+          <MobileNavBtn icon={Gauge} label="Dashboard" active={section === "dashboard"} onClick={() => setSection("dashboard")} />
           <MobileNavBtn icon={LayoutGrid} label="Pedidos" active={section === "pedidos"} onClick={() => setSection("pedidos")} />
           <MobileNavBtn icon={Package} label="Catálogo" active={section === "catalogo"} onClick={() => setSection("catalogo")} />
           <MobileNavBtn icon={BarChart3} label="Reportes" active={section === "reportes"} onClick={() => setSection("reportes")} />
@@ -166,6 +168,7 @@ function Admin() {
           <p className="text-xs text-white/60 mt-1">Panel Admin</p>
         </div>
         <nav className="flex-1 p-3 space-y-1">
+          <NavBtn icon={Gauge} label="Dashboard" active={section === "dashboard"} onClick={() => setSection("dashboard")} />
           <NavBtn icon={LayoutGrid} label="Pedidos" active={section === "pedidos"} onClick={() => setSection("pedidos")} />
           <NavBtn icon={Package} label="Catálogo" active={section === "catalogo"} onClick={() => setSection("catalogo")} />
           <NavBtn icon={BarChart3} label="Reportes" active={section === "reportes"} onClick={() => setSection("reportes")} />
@@ -181,6 +184,7 @@ function Admin() {
       </aside>
 
       <main className="flex-1 min-w-0 px-4 py-6 md:px-10 md:py-8 md:ml-60">
+        {section === "dashboard" && <DashboardView />}
         {section === "pedidos" && <PedidosView />}
         {section === "catalogo" && <CatalogoView />}
         {section === "reportes" && <ReportesView />}
