@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
@@ -64,6 +64,7 @@ const STAGES: { id: Order["estado"]; label: string; icon: typeof Inbox }[] = [
 
 
 function Admin() {
+  const navigate = useNavigate();
   const check = useServerFn(checkAdminSession);
   const unlock = useServerFn(unlockAdmin);
   const lock = useServerFn(lockAdmin);
@@ -81,6 +82,7 @@ function Admin() {
     try { await lock(); } catch { /* ignore */ }
     setAuthed(false);
     setPwd("");
+    navigate({ to: "/", replace: true });
   };
 
   if (authed === null) {
