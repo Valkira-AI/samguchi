@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Phone, MapPin, Instagram, Facebook, Link2 } from "lucide-react";
-import { HOURS_LABEL_FULL } from "@/lib/hours";
+import { useLang } from "@/lib/i18n";
 
 const SOCIAL = {
   instagram: "https://www.instagram.com",
@@ -9,11 +9,12 @@ const SOCIAL = {
 };
 
 export function SiteFooter() {
+  const { t } = useLang();
   return (
     <footer id="contacto" className="border-t border-border bg-background">
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 px-4 py-10 sm:gap-8">
         <div>
-          <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Contacto</h4>
+          <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">{t("footer.contact")}</h4>
           <div className="mt-4 space-y-2">
             <p className="flex items-center gap-2 text-xs text-muted-foreground sm:text-sm">
               <Phone className="h-3.5 w-3.5 text-primary sm:h-4 sm:w-4" /> +54 9 388 400-0000
@@ -24,9 +25,9 @@ export function SiteFooter() {
           </div>
         </div>
         <div>
-          <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">Horarios & Redes</h4>
-          <p className="mt-4 text-xs text-muted-foreground sm:text-sm">{HOURS_LABEL_FULL}</p>
-          <p className="text-xs text-muted-foreground">Pedidos online dentro de ese horario.</p>
+          <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">{t("footer.hoursSocial")}</h4>
+          <p className="mt-4 text-xs text-muted-foreground sm:text-sm">{t("footer.hours")}</p>
+          <p className="text-xs text-muted-foreground">{t("footer.ordersWithin")}</p>
           <div className="mt-4 flex flex-wrap gap-2 sm:gap-4">
             <a href={SOCIAL.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary sm:text-sm">
               <Instagram className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> www.instagram.com
@@ -43,14 +44,13 @@ export function SiteFooter() {
       <div className="border-t border-border px-4 py-4">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 text-center sm:flex-row sm:text-left">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Sam Guchi — Todos los derechos reservados.
+            © {new Date().getFullYear()} Sam Guchi — {t("footer.rights")}
           </p>
           <Link to="/admin" className="text-xs text-muted-foreground hover:text-primary hover:underline">
-            Panel de administración
+            {t("footer.admin")}
           </Link>
         </div>
       </div>
     </footer>
   );
 }
-
