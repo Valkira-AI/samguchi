@@ -3,6 +3,7 @@ import { formatARS } from "@/lib/products";
 import { useCatalog } from "@/lib/catalog-store";
 import heroAsset from "@/assets/hero-menu-wall.png.asset.json";
 import { SiteHeader } from "@/components/SiteHeader";
+import { useLang } from "@/lib/i18n";
 
 const hero = heroAsset.url;
 
@@ -15,6 +16,7 @@ const TOP_IDS = ["p1", "p4"];
 
 function Home() {
   const products = useCatalog();
+  const { t } = useLang();
   const TOP = TOP_IDS.map((id) => products.find((p) => p.id === id)).filter(
     (p): p is NonNullable<typeof p> => Boolean(p),
   );
@@ -30,20 +32,18 @@ function Home() {
         <div className="relative mx-auto max-w-6xl px-4 py-24 md:py-36">
           <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-background/85 px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary shadow-sm ring-1 ring-primary/20 backdrop-blur-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            Jujuy · Sabor argentino
+            {t("home.badge")}
           </p>
           <h1 className="max-w-2xl font-display text-5xl leading-tight text-foreground md:text-7xl">
-            Sándwiches que <span className="text-primary">se sienten en el alma</span>.
+            {t("home.title1")} <span className="text-primary">{t("home.title2")}</span>.
           </h1>
-          <p className="mt-4 max-w-xl text-lg text-muted-foreground">
-            Milanesas doradas al punto justo, lomitos que no se guardan nada y un choripán que lleva el sello jujeño en cada chispa de chimichurri. Compartí con nosotros el gusto de lo auténtico.
-          </p>
+          <p className="mt-4 max-w-xl text-lg text-muted-foreground">{t("home.lead")}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               to="/menu"
               className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-warm hover:opacity-90"
             >
-              Ver el menú
+              {t("home.cta")}
             </Link>
           </div>
         </div>
@@ -52,8 +52,8 @@ function Home() {
       {/* Promos más vendidas */}
       <section className="mx-auto max-w-6xl px-4 py-16">
         <div className="mb-8">
-          <h2 className="font-display text-4xl md:text-5xl">Promos más vendidas</h2>
-          <p className="mt-1 text-muted-foreground">Lo que más piden nuestros clientes.</p>
+          <h2 className="font-display text-4xl md:text-5xl">{t("home.promos")}</h2>
+          <p className="mt-1 text-muted-foreground">{t("home.promosSub")}</p>
         </div>
         <div className="flex flex-wrap justify-center gap-6">
           {TOP.map((p, i) => (
@@ -61,7 +61,7 @@ function Home() {
               <div className="relative aspect-[5/4] overflow-hidden bg-muted">
                 <img src={p.imagen} alt={p.nombre} loading="lazy" width={800} height={640} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                 <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
-                  #{i + 1} Más pedido
+                  #{i + 1} {t("home.masPedido")}
                 </span>
               </div>
               <div className="p-5">
@@ -73,7 +73,7 @@ function Home() {
                     to="/menu"
                     className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
                   >
-                    Pedir
+                    {t("home.pedir")}
                   </Link>
                 </div>
               </div>
