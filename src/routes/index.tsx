@@ -4,6 +4,7 @@ import { useCatalog } from "@/lib/catalog-store";
 import heroAsset from "@/assets/hero-menu-wall.png.asset.json";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useLang } from "@/lib/i18n";
+import { productName, productDescription } from "@/lib/product-i18n";
 
 const hero = heroAsset.url;
 
@@ -16,7 +17,7 @@ const TOP_IDS = ["p1", "p4"];
 
 function Home() {
   const products = useCatalog();
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const TOP = TOP_IDS.map((id) => products.find((p) => p.id === id)).filter(
     (p): p is NonNullable<typeof p> => Boolean(p),
   );
@@ -59,14 +60,14 @@ function Home() {
           {TOP.map((p, i) => (
             <article key={p.id} className="group w-full max-w-sm overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:shadow-warm">
               <div className="relative aspect-[5/4] overflow-hidden bg-muted">
-                <img src={p.imagen} alt={p.nombre} loading="lazy" width={800} height={640} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                <img src={p.imagen} alt={productName(p, lang)} loading="lazy" width={800} height={640} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                 <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
                   #{i + 1} {t("home.masPedido")}
                 </span>
               </div>
               <div className="p-5">
-                <h3 className="font-display text-2xl leading-tight">{p.nombre}</h3>
-                <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.descripcion}</p>
+                <h3 className="font-display text-2xl leading-tight">{productName(p, lang)}</h3>
+                <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{productDescription(p, lang)}</p>
                 <div className="mt-4 flex items-center justify-between">
                   <span className="font-display text-2xl text-primary">{formatARS(p.precio)}</span>
                   <Link
