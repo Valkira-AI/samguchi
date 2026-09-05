@@ -7,6 +7,7 @@ import { addOrder, type OrderItem } from "@/lib/orders-store";
 import { useCatalog } from "@/lib/catalog-store";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useLang } from "@/lib/i18n";
+import { productName, productDescription, categoryLabel } from "@/lib/product-i18n";
 import { HOURS_LABEL, isWithinServiceHours } from "@/lib/hours";
 import { useEffect } from "react";
 
@@ -31,7 +32,7 @@ function Menu() {
   const [variants, setVariants] = useState<Record<string, string>>({});
   const products = useCatalog();
   const [abierto, setAbierto] = useState(true);
-  const { t } = useLang();
+  const { t, lang } = useLang();
 
   useEffect(() => {
     const tick = () => setAbierto(isWithinServiceHours());
@@ -132,7 +133,7 @@ function Menu() {
                   activeCat === c ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary/50"
                 }`}
               >
-                {c === "Todos" ? t("menu.all") : c}
+                {c === "Todos" ? t("menu.all") : categoryLabel(c, lang)}
               </button>
             ))}
           </div>
@@ -148,7 +149,7 @@ function Menu() {
                 {p.imagen ? (
                   <img
                     src={p.imagen}
-                    alt={p.nombre}
+                    alt={productName(p, lang)}
                     loading="lazy"
                     width={800}
                     height={640}
@@ -157,7 +158,7 @@ function Menu() {
                 ) : (
                   <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">{t("menu.noImage")}</div>
                 )}
-                <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2 py-1 text-xs font-semibold">{p.categoria}</span>
+                <span className="absolute left-3 top-3 rounded-full bg-background/90 px-2 py-1 text-xs font-semibold">{categoryLabel(p.categoria, lang)}</span>
                 {!p.disponible && (
                   <span className="absolute right-3 top-3 rounded-full bg-destructive/90 px-2 py-1 text-xs font-semibold text-destructive-foreground">
                     {t("menu.unavailable")}
@@ -166,14 +167,14 @@ function Menu() {
               </div>
               <div className="p-5">
                 <div className="flex items-start justify-between gap-3">
-                  <h3 className="font-display text-2xl leading-tight">{p.nombre}</h3>
+                  <h3 className="font-display text-2xl leading-tight">{productName(p, lang)}</h3>
                   <span className="whitespace-nowrap font-semibold text-primary">{formatARS(p.precio)}</span>
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">{p.descripcion}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{productDescription(p, lang)}</p>
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
                   {p.variantes?.length ? (
                     <select
-                      aria-label={`${t("menu.variantOf")} ${p.nombre}`}
+                      aria-label={`${t("menu.variantOf")} ${productName(p, lang)}`}
                       value={variants[p.id] || p.variantes[0]}
                       onChange={(e) => setVariants((v) => ({ ...v, [p.id]: e.target.value }))}
                       disabled={!p.disponible}
