@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Send } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
+import { useLang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/contacto")({
   head: () => ({
@@ -24,6 +25,7 @@ const inputClass =
   "mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary";
 
 function Contacto() {
+  const { t } = useLang();
   const [form, setForm] = useState({
     nombre: "",
     email: "",
@@ -45,7 +47,7 @@ function Contacto() {
       `Sucursal: ${form.sucursal}%0A` +
       `Mensaje: ${form.mensaje}`;
     window.open(`https://wa.me/5493884000000?text=${texto}`, "_blank", "noopener,noreferrer");
-    toast.success("¡Gracias! Te contactamos a la brevedad.");
+    toast.success(t("contact.thanks"));
     setForm({ nombre: "", email: "", telefono: "", sucursal: SUCURSALES[0], mensaje: "" });
   };
 
@@ -53,29 +55,29 @@ function Contacto() {
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <section className="mx-auto max-w-4xl px-4 py-14">
-        <h1 className="font-display text-4xl text-primary md:text-5xl">Contacto</h1>
-        <p className="mt-3 text-muted-foreground">Escribinos y armamos tu pedido al toque.</p>
+        <h1 className="font-display text-4xl text-primary md:text-5xl">{t("contact.title")}</h1>
+        <p className="mt-3 text-muted-foreground">{t("contact.sub")}</p>
 
         <form
           onSubmit={handleSubmit}
           className="mt-10 rounded-2xl border border-border bg-card p-6 md:p-8"
         >
-          <h2 className="font-display text-2xl text-primary">Dejanos tu mensaje</h2>
+          <h2 className="font-display text-2xl text-primary">{t("contact.formTitle")}</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <label className="block text-sm font-medium">
-              Nombre
-              <input required value={form.nombre} onChange={set("nombre")} className={inputClass} placeholder="Tu nombre" />
+              {t("contact.name")}
+              <input required value={form.nombre} onChange={set("nombre")} className={inputClass} placeholder={t("contact.namePh")} />
             </label>
             <label className="block text-sm font-medium">
-              Email
+              {t("contact.email")}
               <input required type="email" value={form.email} onChange={set("email")} className={inputClass} placeholder="tu@email.com" />
             </label>
             <label className="block text-sm font-medium">
-              Teléfono
+              {t("contact.phone")}
               <input required value={form.telefono} onChange={set("telefono")} className={inputClass} placeholder="+54 9 388 ..." />
             </label>
             <label className="block text-sm font-medium">
-              Sucursal
+              {t("contact.branch")}
               <select value={form.sucursal} onChange={set("sucursal")} className={inputClass}>
                 {SUCURSALES.map((s) => (
                   <option key={s} value={s}>
@@ -86,14 +88,14 @@ function Contacto() {
             </label>
           </div>
           <label className="mt-4 block text-sm font-medium">
-            Mensaje
+            {t("contact.message")}
             <textarea
               required
               rows={4}
               value={form.mensaje}
               onChange={set("mensaje")}
               className={inputClass}
-              placeholder="Contanos en qué te podemos ayudar"
+              placeholder={t("contact.messagePh")}
             />
           </label>
           <button
@@ -101,7 +103,7 @@ function Contacto() {
             className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-warm hover:opacity-90"
           >
             <Send className="h-4 w-4" />
-            Enviar consulta
+            {t("contact.submit")}
           </button>
         </form>
       </section>
