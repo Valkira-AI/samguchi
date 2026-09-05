@@ -17,7 +17,7 @@ const TOP_IDS = ["p1", "p4"];
 
 function Home() {
   const products = useCatalog();
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const TOP = TOP_IDS.map((id) => products.find((p) => p.id === id)).filter(
     (p): p is NonNullable<typeof p> => Boolean(p),
   );
