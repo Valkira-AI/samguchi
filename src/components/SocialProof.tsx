@@ -11,7 +11,7 @@ const COPY = {
     featuredQuote:
       "El mejor sándwich de milanesa de Jujuy. Pan fresco, porción generosa y siempre calentito cuando llega. Ya es parada obligada los viernes.",
     featuredName: "Lucía Ramírez",
-    featuredRole: "Clienta desde 2023 · San Salvador de Jujuy",
+    featuredRole: "Clienta desde 2023 · San Salvador de Jujuy · Agosto 2026",
     verified: "Reseña verificada de Google",
     cta: "Dejá tu reseña con Google",
     ctaNote: "Se abre Google y usás tu cuenta de siempre.",
@@ -19,18 +19,22 @@ const COPY = {
       {
         name: "Martín Álvarez",
         text: "La hamburguesa completa es enorme y el chimichurri del choripán es otro nivel.",
+        date: "Agosto 2026",
       },
       {
         name: "Sofía Quispe",
         text: "Pedí por WhatsApp y en 20 minutos estaba listo. Atención re amable.",
+        date: "Julio 2026",
       },
       {
         name: "Diego Fernández",
         text: "El combo picada jujeña lo compartimos entre tres y sobró. Precio justo.",
+        date: "Junio 2026",
       },
       {
         name: "Camila Torres",
         text: "El sándwich de rúcula y bondiola se volvió mi favorito. Todo súper fresco.",
+        date: "Mayo 2026",
       },
     ],
   },
@@ -40,7 +44,7 @@ const COPY = {
     featuredQuote:
       "The best milanesa sandwich in Jujuy. Fresh bread, generous portion and always warm on arrival. A must every Friday.",
     featuredName: "Lucía Ramírez",
-    featuredRole: "Customer since 2023 · San Salvador de Jujuy",
+    featuredRole: "Customer since 2023 · San Salvador de Jujuy · August 2026",
     verified: "Verified Google review",
     cta: "Leave your review with Google",
     ctaNote: "Opens Google and uses your usual account.",
@@ -48,18 +52,22 @@ const COPY = {
       {
         name: "Martín Álvarez",
         text: "The hamburguesa completa is huge and the choripán chimichurri is next level.",
+        date: "August 2026",
       },
       {
         name: "Sofía Quispe",
         text: "Ordered on WhatsApp and it was ready in 20 minutes. Lovely service.",
+        date: "July 2026",
       },
       {
         name: "Diego Fernández",
         text: "We shared the combo picada jujeña between three and had leftovers. Fair price.",
+        date: "June 2026",
       },
       {
         name: "Camila Torres",
         text: "The rúcula and bondiola sandwich is now my favorite. Everything super fresh.",
+        date: "May 2026",
       },
     ],
   },
@@ -120,7 +128,7 @@ export function SocialProof() {
                     <p className="text-sm font-semibold">{r.name}</p>
                     <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                       <BadgeCheck className="h-3 w-3 text-primary" />
-                      Google
+                      Google · {r.date}
                     </span>
                   </div>
                 </div>
