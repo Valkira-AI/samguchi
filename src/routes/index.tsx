@@ -85,6 +85,7 @@ function Home() {
         </div>
       </section>
 
+      <SocialProof />
     </div>
   );
 }
