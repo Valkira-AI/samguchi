@@ -3,6 +3,8 @@ import { formatARS } from "@/lib/products";
 import { useCatalog } from "@/lib/catalog-store";
 import heroAsset from "@/assets/hero-menu-wall.png.asset.json";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SocialProof } from "@/components/SocialProof";
+
 import { useLang } from "@/lib/i18n";
 import { productName, productDescription } from "@/lib/product-i18n";
 
@@ -83,6 +85,7 @@ function Home() {
         </div>
       </section>
 
+      <SocialProof />
     </div>
   );
 }
