@@ -3,7 +3,6 @@ import { ClientOnly } from "@tanstack/react-router";
 import { DollarSign, LayoutGrid, BarChart3, Sandwich, CupSoda, TrendingUp } from "lucide-react";
 import { formatARS } from "@/lib/products";
 import { useOrders } from "@/lib/orders-store";
-import StaffPanel from "./StaffPanel";
 
 const TopProductsDonut = lazy(() => import("./TopProductsDonut"));
 
@@ -188,7 +187,7 @@ export default function DashboardView() {
         </div>
       </div>
 
-      <StaffPanel />
+
     </div>
   );
 }
