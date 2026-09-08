@@ -3,12 +3,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock, Plus, Trash2, Inbox, ChefHat, Bike, CheckCircle2, Gauge } from "lucide-react";
+import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock, Plus, Trash2, Inbox, ChefHat, Bike, CheckCircle2, Gauge, Users } from "lucide-react";
 import { updateOrderState, useOrders, type Order } from "@/lib/orders-store";
 import { formatARS, CATEGORIES, type Product, type Category } from "@/lib/products";
 import { useCatalog, updateProduct, setProductAvailability, createProduct, deleteProduct } from "@/lib/catalog-store";
 import { checkAdminSession, unlockAdmin, lockAdmin } from "@/lib/admin-gate.functions";
 import DashboardView from "@/components/admin/DashboardView";
+import StaffPanel from "@/components/admin/StaffPanel";
 import { HOURS_LABEL, isOrderInServiceHours } from "@/lib/hours";
 
 export const Route = createFileRoute("/admin")({
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-type Section = "dashboard" | "pedidos" | "catalogo" | "reportes";
+type Section = "dashboard" | "pedidos" | "catalogo" | "personal" | "reportes";
 
 
 /* ---------- demo prototype data ---------- */
@@ -159,6 +160,7 @@ function Admin() {
           <MobileNavBtn icon={Gauge} label="Dashboard" active={section === "dashboard"} onClick={() => setSection("dashboard")} />
           <MobileNavBtn icon={LayoutGrid} label="Pedidos" active={section === "pedidos"} onClick={() => setSection("pedidos")} />
           <MobileNavBtn icon={Package} label="Catálogo" active={section === "catalogo"} onClick={() => setSection("catalogo")} />
+          <MobileNavBtn icon={Users} label="Personal" active={section === "personal"} onClick={() => setSection("personal")} />
           <MobileNavBtn icon={BarChart3} label="Reportes" active={section === "reportes"} onClick={() => setSection("reportes")} />
         </nav>
       </div>
@@ -173,6 +175,7 @@ function Admin() {
           <NavBtn icon={Gauge} label="Dashboard" active={section === "dashboard"} onClick={() => setSection("dashboard")} />
           <NavBtn icon={LayoutGrid} label="Pedidos" active={section === "pedidos"} onClick={() => setSection("pedidos")} />
           <NavBtn icon={Package} label="Catálogo" active={section === "catalogo"} onClick={() => setSection("catalogo")} />
+          <NavBtn icon={Users} label="Personal" active={section === "personal"} onClick={() => setSection("personal")} />
           <NavBtn icon={BarChart3} label="Reportes" active={section === "reportes"} onClick={() => setSection("reportes")} />
         </nav>
         <div className="p-3 border-t border-white/10">
@@ -189,8 +192,19 @@ function Admin() {
         {section === "dashboard" && <DashboardView />}
         {section === "pedidos" && <PedidosView />}
         {section === "catalogo" && <CatalogoView />}
+        {section === "personal" && <PersonalView />}
         {section === "reportes" && <ReportesView />}
       </main>
+    </div>
+  );
+}
+
+function PersonalView() {
+  return (
+    <div>
+      <h1 className="font-display text-2xl md:text-4xl text-foreground">PERSONAL</h1>
+      <p className="text-sm text-muted-foreground mt-1">Turnos por noche y noches trabajadas</p>
+      <StaffPanel />
     </div>
   );
 }
