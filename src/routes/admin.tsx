@@ -1,29 +1,50 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
-import { Download, LayoutGrid, Package, BarChart3, LogOut, Pencil, User, ChevronRight, DollarSign, ArrowLeft, Lock, Plus, Trash2, Inbox, ChefHat, Bike, CheckCircle2, Gauge, Users } from "lucide-react";
+import {
+  Download,
+  LayoutGrid,
+  Package,
+  BarChart3,
+  LogOut,
+  Pencil,
+  User,
+  ChevronRight,
+  DollarSign,
+  ArrowLeft,
+  Lock,
+  Plus,
+  Trash2,
+  Inbox,
+  ChefHat,
+  Bike,
+  CheckCircle2,
+  Gauge,
+  Users,
+} from "lucide-react";
 import { updateOrderState, useOrders, type Order } from "@/lib/orders-store";
 import { formatARS, CATEGORIES, type Product, type Category } from "@/lib/products";
-import { useCatalog, updateProduct, setProductAvailability, createProduct, deleteProduct } from "@/lib/catalog-store";
-import { checkAdminSession, unlockAdmin, lockAdmin } from "@/lib/admin-gate.functions";
+import {
+  useCatalog,
+  updateProduct,
+  setProductAvailability,
+  createProduct,
+  deleteProduct,
+} from "@/lib/catalog-store";
+import { checkAdminSession, unlockAdmin, lockAdmin } from "@/lib/admin-gate";
 import DashboardView from "@/components/admin/DashboardView";
 import StaffPanel from "@/components/admin/StaffPanel";
 import { HOURS_LABEL, isOrderInServiceHours } from "@/lib/hours";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
-    meta: [
-      { title: "Panel · Sam Guchi" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Panel · Sam Guchi" }, { name: "robots", content: "noindex" }],
   }),
   component: Admin,
 });
 
 type Section = "dashboard" | "pedidos" | "catalogo" | "personal" | "reportes";
-
 
 /* ---------- demo prototype data ---------- */
 type DemoOrder = {
@@ -35,11 +56,58 @@ type DemoOrder = {
   total: number;
 };
 const DEMO_ORDERS: DemoOrder[] = [
-  { id: "#1001", estado: "Nuevo", cliente: "Marcos R.", hora: "20:32 hs", items: [{ cant: 2, nombre: "Milanesa Simple" }, { cant: 2, nombre: "Coca-Cola 500ml" }], total: 8800 },
-  { id: "#1002", estado: "En Preparación", cliente: "Laura G.", hora: "20:55 hs", items: [{ cant: 1, nombre: "Lomito Simple" }, { cant: 1, nombre: "Agua Mineral 500ml" }], total: 6600 },
-  { id: "#1003", estado: "Despachado", cliente: "Diego M.", hora: "21:40 hs", items: [{ cant: 1, nombre: "Hamburguesa Clásica" }, { cant: 1, nombre: "Jugo Natural" }], total: 5700 },
-  { id: "#1004", estado: "Finalizado", cliente: "Sofía P.", hora: "22:30 hs", items: [{ cant: 2, nombre: "Milanesa Completa" }], total: 9000 },
-  { id: "#1005", estado: "Finalizado", cliente: "Julián A.", hora: "23:15 hs", items: [{ cant: 1, nombre: "Lomito Completo" }, { cant: 2, nombre: "Coca-Cola 500ml" }], total: 8800 },
+  {
+    id: "#1001",
+    estado: "Nuevo",
+    cliente: "Marcos R.",
+    hora: "20:32 hs",
+    items: [
+      { cant: 2, nombre: "Milanesa Simple" },
+      { cant: 2, nombre: "Coca-Cola 500ml" },
+    ],
+    total: 8800,
+  },
+  {
+    id: "#1002",
+    estado: "En Preparación",
+    cliente: "Laura G.",
+    hora: "20:55 hs",
+    items: [
+      { cant: 1, nombre: "Lomito Simple" },
+      { cant: 1, nombre: "Agua Mineral 500ml" },
+    ],
+    total: 6600,
+  },
+  {
+    id: "#1003",
+    estado: "Despachado",
+    cliente: "Diego M.",
+    hora: "21:40 hs",
+    items: [
+      { cant: 1, nombre: "Hamburguesa Clásica" },
+      { cant: 1, nombre: "Jugo Natural" },
+    ],
+    total: 5700,
+  },
+  {
+    id: "#1004",
+    estado: "Finalizado",
+    cliente: "Sofía P.",
+    hora: "22:30 hs",
+    items: [{ cant: 2, nombre: "Milanesa Completa" }],
+    total: 9000,
+  },
+  {
+    id: "#1005",
+    estado: "Finalizado",
+    cliente: "Julián A.",
+    hora: "23:15 hs",
+    items: [
+      { cant: 1, nombre: "Lomito Completo" },
+      { cant: 2, nombre: "Coca-Cola 500ml" },
+    ],
+    total: 8800,
+  },
 ];
 
 const NEXT_STATE: Record<Order["estado"], Order["estado"] | null> = {
@@ -63,12 +131,8 @@ const STAGES: { id: Order["estado"]; label: string; icon: typeof Inbox }[] = [
   { id: "Finalizado", label: "Finalizado", icon: CheckCircle2 },
 ];
 
-
 function Admin() {
   const navigate = useNavigate();
-  const check = useServerFn(checkAdminSession);
-  const unlock = useServerFn(unlockAdmin);
-  const lock = useServerFn(lockAdmin);
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [pwd, setPwd] = useState("");
   const [error, setError] = useState(false);
@@ -76,18 +140,28 @@ function Admin() {
   const [section, setSection] = useState<Section>("dashboard");
 
   useEffect(() => {
-    check().then((r) => setAuthed(r.unlocked)).catch(() => setAuthed(false));
-  }, [check]);
+    checkAdminSession()
+      .then((r) => setAuthed(r.unlocked))
+      .catch(() => setAuthed(false));
+  }, []);
 
   const handleLogout = async () => {
-    try { await lock(); } catch { /* ignore */ }
+    try {
+      await lockAdmin();
+    } catch {
+      /* ignore */
+    }
     setAuthed(false);
     setPwd("");
     navigate({ to: "/", replace: true });
   };
 
   if (authed === null) {
-    return <div className="min-h-screen grid place-items-center bg-background text-sm text-muted-foreground">Cargando…</div>;
+    return (
+      <div className="min-h-screen grid place-items-center bg-background text-sm text-muted-foreground">
+        Cargando…
+      </div>
+    );
   }
 
   if (!authed) {
@@ -99,9 +173,12 @@ function Admin() {
             if (submitting) return;
             setSubmitting(true);
             try {
-              const res = await unlock({ data: { password: pwd } });
-              if (res.ok) { setAuthed(true); setError(false); setPwd(""); }
-              else setError(true);
+              const res = await unlockAdmin({ data: { password: pwd } });
+              if (res.ok) {
+                setAuthed(true);
+                setError(false);
+                setPwd("");
+              } else setError(true);
             } catch {
               setError(true);
             } finally {
@@ -123,16 +200,25 @@ function Admin() {
           <input
             type="password"
             value={pwd}
-            onChange={(e) => { setPwd(e.target.value); setError(false); }}
+            onChange={(e) => {
+              setPwd(e.target.value);
+              setError(false);
+            }}
             autoFocus
             className="mt-2 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary"
             placeholder="••••••••"
           />
           {error && <p className="mt-2 text-xs text-destructive">Contraseña incorrecta</p>}
-          <button disabled={submitting} className="mt-4 w-full rounded-md bg-primary py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60">
+          <button
+            disabled={submitting}
+            className="mt-4 w-full rounded-md bg-primary py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
+          >
             {submitting ? "Verificando…" : "Ingresar"}
           </button>
-          <Link to="/" className="mt-4 flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-primary">
+          <Link
+            to="/"
+            className="mt-4 flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-primary"
+          >
             <ArrowLeft className="h-3 w-3" /> Volver al inicio
           </Link>
         </form>
@@ -146,7 +232,9 @@ function Admin() {
       <div className="md:hidden bg-[#1a1a1a] text-white sticky top-0 z-40">
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
           <div>
-            <h1 className="font-display text-xl text-[oklch(0.78_0.17_75)] leading-none">SAM GUCHI</h1>
+            <h1 className="font-display text-xl text-[oklch(0.78_0.17_75)] leading-none">
+              SAM GUCHI
+            </h1>
             <p className="text-[10px] text-white/60 mt-0.5">Panel Admin</p>
           </div>
           <button
@@ -157,26 +245,78 @@ function Admin() {
           </button>
         </div>
         <nav className="flex px-2 py-2 gap-1 overflow-x-auto">
-          <MobileNavBtn icon={Gauge} label="Dashboard" active={section === "dashboard"} onClick={() => setSection("dashboard")} />
-          <MobileNavBtn icon={LayoutGrid} label="Pedidos" active={section === "pedidos"} onClick={() => setSection("pedidos")} />
-          <MobileNavBtn icon={Package} label="Catálogo" active={section === "catalogo"} onClick={() => setSection("catalogo")} />
-          <MobileNavBtn icon={Users} label="Personal" active={section === "personal"} onClick={() => setSection("personal")} />
-          <MobileNavBtn icon={BarChart3} label="Reportes" active={section === "reportes"} onClick={() => setSection("reportes")} />
+          <MobileNavBtn
+            icon={Gauge}
+            label="Dashboard"
+            active={section === "dashboard"}
+            onClick={() => setSection("dashboard")}
+          />
+          <MobileNavBtn
+            icon={LayoutGrid}
+            label="Pedidos"
+            active={section === "pedidos"}
+            onClick={() => setSection("pedidos")}
+          />
+          <MobileNavBtn
+            icon={Package}
+            label="Catálogo"
+            active={section === "catalogo"}
+            onClick={() => setSection("catalogo")}
+          />
+          <MobileNavBtn
+            icon={Users}
+            label="Personal"
+            active={section === "personal"}
+            onClick={() => setSection("personal")}
+          />
+          <MobileNavBtn
+            icon={BarChart3}
+            label="Reportes"
+            active={section === "reportes"}
+            onClick={() => setSection("reportes")}
+          />
         </nav>
       </div>
 
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-60 shrink-0 bg-[#1a1a1a] text-white flex-col fixed inset-y-0 left-0 z-40 overflow-y-auto">
         <div className="px-6 py-6 border-b border-white/10">
-          <h1 className="font-display text-2xl text-[oklch(0.78_0.17_75)] leading-none">SAM GUCHI</h1>
+          <h1 className="font-display text-2xl text-[oklch(0.78_0.17_75)] leading-none">
+            SAM GUCHI
+          </h1>
           <p className="text-xs text-white/60 mt-1">Panel Admin</p>
         </div>
         <nav className="flex-1 p-3 space-y-1">
-          <NavBtn icon={Gauge} label="Dashboard" active={section === "dashboard"} onClick={() => setSection("dashboard")} />
-          <NavBtn icon={LayoutGrid} label="Pedidos" active={section === "pedidos"} onClick={() => setSection("pedidos")} />
-          <NavBtn icon={Package} label="Catálogo" active={section === "catalogo"} onClick={() => setSection("catalogo")} />
-          <NavBtn icon={Users} label="Personal" active={section === "personal"} onClick={() => setSection("personal")} />
-          <NavBtn icon={BarChart3} label="Reportes" active={section === "reportes"} onClick={() => setSection("reportes")} />
+          <NavBtn
+            icon={Gauge}
+            label="Dashboard"
+            active={section === "dashboard"}
+            onClick={() => setSection("dashboard")}
+          />
+          <NavBtn
+            icon={LayoutGrid}
+            label="Pedidos"
+            active={section === "pedidos"}
+            onClick={() => setSection("pedidos")}
+          />
+          <NavBtn
+            icon={Package}
+            label="Catálogo"
+            active={section === "catalogo"}
+            onClick={() => setSection("catalogo")}
+          />
+          <NavBtn
+            icon={Users}
+            label="Personal"
+            active={section === "personal"}
+            onClick={() => setSection("personal")}
+          />
+          <NavBtn
+            icon={BarChart3}
+            label="Reportes"
+            active={section === "reportes"}
+            onClick={() => setSection("reportes")}
+          />
         </nav>
         <div className="p-3 border-t border-white/10">
           <button
@@ -209,7 +349,17 @@ function PersonalView() {
   );
 }
 
-function MobileNavBtn({ icon: Icon, label, active, onClick }: { icon: typeof LayoutGrid; label: string; active: boolean; onClick: () => void }) {
+function MobileNavBtn({
+  icon: Icon,
+  label,
+  active,
+  onClick,
+}: {
+  icon: typeof LayoutGrid;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
   return (
     <button
       onClick={onClick}
@@ -222,15 +372,24 @@ function MobileNavBtn({ icon: Icon, label, active, onClick }: { icon: typeof Lay
   );
 }
 
-
-
-
-function NavBtn({ icon: Icon, label, active, onClick }: { icon: typeof LayoutGrid; label: string; active: boolean; onClick: () => void }) {
+function NavBtn({
+  icon: Icon,
+  label,
+  active,
+  onClick,
+}: {
+  icon: typeof LayoutGrid;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
   return (
     <button
       onClick={onClick}
       className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition ${
-        active ? "bg-primary text-primary-foreground" : "text-white/70 hover:bg-white/5 hover:text-white"
+        active
+          ? "bg-primary text-primary-foreground"
+          : "text-white/70 hover:bg-white/5 hover:text-white"
       }`}
     >
       <Icon className="h-4 w-4" /> {label}
@@ -247,8 +406,8 @@ function PedidosView() {
     () => allOrders.filter((o) => isOrderInServiceHours(o.fecha)),
     [allOrders],
   );
-  const [demoStates, setDemoStates] = useState<Record<string, Order["estado"]>>(
-    () => Object.fromEntries(DEMO_ORDERS.map((o) => [o.id, o.estado])),
+  const [demoStates, setDemoStates] = useState<Record<string, Order["estado"]>>(() =>
+    Object.fromEntries(DEMO_ORDERS.map((o) => [o.id, o.estado])),
   );
   const [dragId, setDragId] = useState<string | null>(null);
   const [overStage, setOverStage] = useState<Order["estado"] | null>(null);
@@ -294,7 +453,8 @@ function PedidosView() {
     id: o.id,
     estado: o.estado,
     cliente: o.cliente,
-    hora: new Date(o.fecha).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) + " hs",
+    hora:
+      new Date(o.fecha).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) + " hs",
     total: o.total,
     items: o.items.map((i) => ({ cant: i.cantidad, nombre: i.nombre })),
     real: true,
@@ -311,7 +471,8 @@ function PedidosView() {
       Finalizado: all.filter((e) => e === "Finalizado").length,
     };
   }, [boardCards]);
-  const totalPipeline = counts.Nuevo + counts["En Preparación"] + counts.Despachado + counts.Finalizado;
+  const totalPipeline =
+    counts.Nuevo + counts["En Preparación"] + counts.Despachado + counts.Finalizado;
 
   const moveCard = (card: BoardCard, estado: Order["estado"]) => {
     if (card.estado === estado) return;
@@ -330,10 +491,11 @@ function PedidosView() {
     if (next) moveCard(card, next);
   };
 
-
   return (
     <div>
-      <h1 className="font-display text-2xl md:text-4xl mb-2 text-foreground">DASHBOARD DE PEDIDOS</h1>
+      <h1 className="font-display text-2xl md:text-4xl mb-2 text-foreground">
+        DASHBOARD DE PEDIDOS
+      </h1>
       <p className="mb-6 inline-flex rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
         Horario de pedidos: {HOURS_LABEL} hs
       </p>
@@ -348,7 +510,9 @@ function PedidosView() {
               <div key={s.id} className="flex flex-1 items-center gap-2">
                 <div
                   className={`flex-1 rounded-2xl border p-4 transition ${
-                    active ? `${ESTADO_STYLES[s.id]} shadow-sm` : "border-border bg-card text-muted-foreground"
+                    active
+                      ? `${ESTADO_STYLES[s.id]} shadow-sm`
+                      : "border-border bg-card text-muted-foreground"
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -359,12 +523,16 @@ function PedidosView() {
                   <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-foreground/10">
                     <div
                       className="h-full rounded-full bg-current transition-all"
-                      style={{ width: `${totalPipeline ? (counts[s.id] / totalPipeline) * 100 : 0}%` }}
+                      style={{
+                        width: `${totalPipeline ? (counts[s.id] / totalPipeline) * 100 : 0}%`,
+                      }}
                     />
                   </div>
                 </div>
                 {i < STAGES.length - 1 && (
-                  <ChevronRight className={`h-5 w-5 shrink-0 ${active ? "text-primary" : "text-muted-foreground/40"}`} />
+                  <ChevronRight
+                    className={`h-5 w-5 shrink-0 ${active ? "text-primary" : "text-muted-foreground/40"}`}
+                  />
                 )}
               </div>
             );
@@ -373,7 +541,9 @@ function PedidosView() {
       </div>
 
       {/* Tablero de trayectoria (arrastrable) */}
-      <p className="mb-2 text-xs text-muted-foreground">Arrastrá las tarjetas entre columnas para cambiar su estado.</p>
+      <p className="mb-2 text-xs text-muted-foreground">
+        Arrastrá las tarjetas entre columnas para cambiar su estado.
+      </p>
       <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {STAGES.map((s) => {
           const Icon = s.icon;
@@ -399,7 +569,9 @@ function PedidosView() {
               }`}
             >
               <div className="mb-3 flex items-center gap-2">
-                <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[s.id]}`}>
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[s.id]}`}
+                >
                   <Icon className="h-3.5 w-3.5" /> {s.label}
                 </span>
                 <span className="ml-auto text-xs text-muted-foreground">{col.length}</span>
@@ -431,10 +603,11 @@ function PedidosView() {
                         setOverStage(null);
                       }}
                       className={`rounded-xl border border-border bg-card p-4 ${
-                        o.estado === "Finalizado" ? "cursor-default opacity-90" : "cursor-grab active:cursor-grabbing"
+                        o.estado === "Finalizado"
+                          ? "cursor-default opacity-90"
+                          : "cursor-grab active:cursor-grabbing"
                       } ${dragId === o.id ? "opacity-50" : ""}`}
                     >
-
                       <div className="flex items-center justify-between">
                         <span className="font-display text-xl">{o.id}</span>
                         <span className="text-xs text-muted-foreground">{o.hora}</span>
@@ -458,14 +631,20 @@ function PedidosView() {
                               className={`h-2 w-2 shrink-0 rounded-full ${idx < step ? "bg-primary" : "bg-border"}`}
                             />
                             {idx < STAGES.length - 1 && (
-                              <span className={`h-0.5 flex-1 rounded-full ${idx < step - 1 ? "bg-primary" : "bg-border"}`} />
+                              <span
+                                className={`h-0.5 flex-1 rounded-full ${idx < step - 1 ? "bg-primary" : "bg-border"}`}
+                              />
                             )}
                           </div>
                         ))}
                       </div>
-                      <p className="mt-1 text-[11px] text-muted-foreground">Etapa {step} de {STAGES.length}</p>
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        Etapa {step} de {STAGES.length}
+                      </p>
                       <div className="mt-3 flex items-center justify-between gap-2">
-                        <span className="font-display text-lg text-primary">{formatARS(o.total)}</span>
+                        <span className="font-display text-lg text-primary">
+                          {formatARS(o.total)}
+                        </span>
                         {next && (
                           <button
                             onClick={() => advanceDemo(o.id)}
@@ -485,22 +664,33 @@ function PedidosView() {
       </div>
 
       <div className="space-y-4">
-
-
         {realOrders.length > 0 && (
           <>
-            <h2 className="font-display text-2xl mt-8 mb-2">Historial de pedidos · {HOURS_LABEL} hs</h2>
+            <h2 className="font-display text-2xl mt-8 mb-2">
+              Historial de pedidos · {HOURS_LABEL} hs
+            </h2>
             {realOrders.map((o) => (
               <div key={o.id} className="rounded-2xl bg-card border border-border p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-3 mb-3">
                       <span className="font-mono text-sm">{o.id}</span>
-                      <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[o.estado]}`}>{o.estado}</span>
-                      <span className="flex items-center gap-1 text-sm text-muted-foreground"><User className="h-3.5 w-3.5" />{o.cliente}</span>
+                      <span
+                        className={`rounded-full border px-3 py-1 text-xs font-semibold ${ESTADO_STYLES[o.estado]}`}
+                      >
+                        {o.estado}
+                      </span>
+                      <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <User className="h-3.5 w-3.5" />
+                        {o.cliente}
+                      </span>
                     </div>
                     <ul className="text-sm text-muted-foreground">
-                      {o.items.map((i) => <li key={i.id}>{i.cantidad}× {i.nombre}</li>)}
+                      {o.items.map((i) => (
+                        <li key={i.id}>
+                          {i.cantidad}× {i.nombre}
+                        </li>
+                      ))}
                     </ul>
                     <p className="mt-3 font-display text-2xl text-primary">{formatARS(o.total)}</p>
                   </div>
@@ -509,9 +699,11 @@ function PedidosView() {
                     onChange={(e) => updateOrderState(o.id, e.target.value as Order["estado"])}
                     className="rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    {(["Nuevo", "En Preparación", "Despachado", "Finalizado"] as const).map((s) =>
-                      <option key={s} value={s}>{s}</option>
-                    )}
+                    {(["Nuevo", "En Preparación", "Despachado", "Finalizado"] as const).map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -585,10 +777,16 @@ function CatalogoView() {
 
       <div className="rounded-2xl bg-card border border-border overflow-hidden">
         <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_100px] px-6 py-4 border-b border-border text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          <div>Producto</div><div>Categoría</div><div>Precio</div><div>Disponible</div><div />
+          <div>Producto</div>
+          <div>Categoría</div>
+          <div>Precio</div>
+          <div>Disponible</div>
+          <div />
         </div>
         {items.length === 0 && (
-          <div className="px-6 py-10 text-center text-sm text-muted-foreground">No hay productos en el catálogo.</div>
+          <div className="px-6 py-10 text-center text-sm text-muted-foreground">
+            No hay productos en el catálogo.
+          </div>
         )}
         {items.map((it) => (
           <div
@@ -596,17 +794,26 @@ function CatalogoView() {
             className={`flex flex-col gap-3 md:grid md:grid-cols-[2fr_1fr_1fr_1fr_100px] md:items-center px-4 md:px-6 py-3 border-b border-border/60 last:border-0 ${!it.disponible ? "opacity-50" : ""}`}
           >
             <div className="flex items-center gap-3 min-w-0">
-              {it.imagen
-                ? <img src={it.imagen} alt={it.nombre} className="h-11 w-11 shrink-0 rounded-full object-cover" />
-                : <div className="h-11 w-11 shrink-0 rounded-full bg-muted" />}
+              {it.imagen ? (
+                <img
+                  src={it.imagen}
+                  alt={it.nombre}
+                  className="h-11 w-11 shrink-0 rounded-full object-cover"
+                />
+              ) : (
+                <div className="h-11 w-11 shrink-0 rounded-full bg-muted" />
+              )}
               <span className="font-medium truncate">{it.nombre}</span>
             </div>
             <div className="text-sm text-muted-foreground md:block">
-              <span className="md:hidden text-xs uppercase tracking-wide mr-2">Categoría:</span>{it.categoria}
+              <span className="md:hidden text-xs uppercase tracking-wide mr-2">Categoría:</span>
+              {it.categoria}
             </div>
             <div className="font-display text-xl text-primary">{formatARS(it.precio)}</div>
             <div className="flex items-center justify-between md:block">
-              <span className="md:hidden text-xs uppercase tracking-wide text-muted-foreground">Disponible</span>
+              <span className="md:hidden text-xs uppercase tracking-wide text-muted-foreground">
+                Disponible
+              </span>
               <button
                 onClick={() => toggle(it)}
                 className={`inline-flex items-center rounded-full border px-4 py-1 text-xs font-bold uppercase transition ${
@@ -639,9 +846,17 @@ function CatalogoView() {
       </div>
 
       {editing && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 overflow-y-auto" onClick={() => setEditing(null)}>
-          <div className="w-full max-w-md rounded-2xl bg-card p-6 border border-border" onClick={(e) => e.stopPropagation()}>
-            <h2 className="font-display text-2xl mb-4">{editing.id ? "Editar producto" : "Nuevo producto"}</h2>
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 overflow-y-auto"
+          onClick={() => setEditing(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-card p-6 border border-border"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="font-display text-2xl mb-4">
+              {editing.id ? "Editar producto" : "Nuevo producto"}
+            </h2>
             <label className="text-sm font-medium">Nombre</label>
             <input
               className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -661,7 +876,11 @@ function CatalogoView() {
               value={editing.categoria}
               onChange={(e) => setEditing({ ...editing, categoria: e.target.value as Category })}
             >
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
             </select>
             <label className="mt-3 block text-sm font-medium">Precio</label>
             <input
@@ -686,8 +905,18 @@ function CatalogoView() {
               Disponible
             </label>
             <div className="mt-6 flex justify-end gap-2">
-              <button onClick={() => setEditing(null)} className="rounded-md border border-input px-4 py-2 text-sm hover:bg-muted">Cancelar</button>
-              <button onClick={() => save(editing)} className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">Guardar</button>
+              <button
+                onClick={() => setEditing(null)}
+                className="rounded-md border border-input px-4 py-2 text-sm hover:bg-muted"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => save(editing)}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              >
+                Guardar
+              </button>
             </div>
           </div>
         </div>
@@ -798,23 +1027,93 @@ const REPORTES: Record<
   },
 };
 
-type Opcion = { id: string; label: string; rango: string; factor: number; crecimiento: string; mejorMomento: string };
+type Opcion = {
+  id: string;
+  label: string;
+  rango: string;
+  factor: number;
+  crecimiento: string;
+  mejorMomento: string;
+};
 
 const OPCIONES: Record<Periodo, Opcion[]> = {
   semanal: [
-    { id: "s34", label: "Semana 17 – 23 ago", rango: "Lun 17 – Dom 23 de agosto", factor: 1, crecimiento: "+8,4% vs. semana anterior", mejorMomento: "Sábado (21:30 a 23:00)" },
-    { id: "s33", label: "Semana 10 – 16 ago", rango: "Lun 10 – Dom 16 de agosto", factor: 0.92, crecimiento: "+3,1% vs. semana anterior", mejorMomento: "Viernes (21:00 a 22:30)" },
-    { id: "s32", label: "Semana 3 – 9 ago", rango: "Lun 3 – Dom 9 de agosto", factor: 0.86, crecimiento: "-1,8% vs. semana anterior", mejorMomento: "Sábado (22:00 a 23:30)" },
+    {
+      id: "s34",
+      label: "Semana 17 – 23 ago",
+      rango: "Lun 17 – Dom 23 de agosto",
+      factor: 1,
+      crecimiento: "+8,4% vs. semana anterior",
+      mejorMomento: "Sábado (21:30 a 23:00)",
+    },
+    {
+      id: "s33",
+      label: "Semana 10 – 16 ago",
+      rango: "Lun 10 – Dom 16 de agosto",
+      factor: 0.92,
+      crecimiento: "+3,1% vs. semana anterior",
+      mejorMomento: "Viernes (21:00 a 22:30)",
+    },
+    {
+      id: "s32",
+      label: "Semana 3 – 9 ago",
+      rango: "Lun 3 – Dom 9 de agosto",
+      factor: 0.86,
+      crecimiento: "-1,8% vs. semana anterior",
+      mejorMomento: "Sábado (22:00 a 23:30)",
+    },
   ],
   mensual: [
-    { id: "m8", label: "Agosto 2026", rango: "Agosto 2026", factor: 1, crecimiento: "+12,1% vs. julio", mejorMomento: "Fines de semana (72% de las ventas)" },
-    { id: "m7", label: "Julio 2026", rango: "Julio 2026", factor: 1.41, crecimiento: "+49,4% vs. junio", mejorMomento: "Vacaciones de invierno (todas las noches)" },
-    { id: "m6", label: "Junio 2026", rango: "Junio 2026", factor: 0.94, crecimiento: "+4,5% vs. mayo", mejorMomento: "Fines de semana (68% de las ventas)" },
+    {
+      id: "m8",
+      label: "Agosto 2026",
+      rango: "Agosto 2026",
+      factor: 1,
+      crecimiento: "+12,1% vs. julio",
+      mejorMomento: "Fines de semana (72% de las ventas)",
+    },
+    {
+      id: "m7",
+      label: "Julio 2026",
+      rango: "Julio 2026",
+      factor: 1.41,
+      crecimiento: "+49,4% vs. junio",
+      mejorMomento: "Vacaciones de invierno (todas las noches)",
+    },
+    {
+      id: "m6",
+      label: "Junio 2026",
+      rango: "Junio 2026",
+      factor: 0.94,
+      crecimiento: "+4,5% vs. mayo",
+      mejorMomento: "Fines de semana (68% de las ventas)",
+    },
   ],
   anual: [
-    { id: "a2026", label: "Año 2026", rango: "Año 2026 (ene – ago)", factor: 1, crecimiento: "+23,7% vs. 2025", mejorMomento: "Julio (vacaciones de invierno)" },
-    { id: "a2025", label: "Año 2025", rango: "Año 2025 (completo)", factor: 0.81, crecimiento: "+15,2% vs. 2024", mejorMomento: "Julio (vacaciones de invierno)" },
-    { id: "a2024", label: "Año 2024", rango: "Año 2024 (completo)", factor: 0.7, crecimiento: "+9,6% vs. 2023", mejorMomento: "Diciembre (fiestas)" },
+    {
+      id: "a2026",
+      label: "Año 2026",
+      rango: "Año 2026 (ene – ago)",
+      factor: 1,
+      crecimiento: "+23,7% vs. 2025",
+      mejorMomento: "Julio (vacaciones de invierno)",
+    },
+    {
+      id: "a2025",
+      label: "Año 2025",
+      rango: "Año 2025 (completo)",
+      factor: 0.81,
+      crecimiento: "+15,2% vs. 2024",
+      mejorMomento: "Julio (vacaciones de invierno)",
+    },
+    {
+      id: "a2024",
+      label: "Año 2024",
+      rango: "Año 2024 (completo)",
+      factor: 0.7,
+      crecimiento: "+9,6% vs. 2023",
+      mejorMomento: "Diciembre (fiestas)",
+    },
   ],
 };
 
@@ -852,29 +1151,31 @@ function ReportesView() {
   const maxTotal = Math.max(...topProducts.map((t) => t.total));
   const maxSerie = Math.max(...data.serie.map((s) => s.valor));
 
-
   const exportExcel = () => {
     const resumen = [
-      { "Métrica": "Período", "Valor ($)": `${data.etiqueta} · ${data.rango}` },
-      { "Métrica": "Ingresos", "Valor ($)": data.ingresos },
-      { "Métrica": "Pedidos", "Valor ($)": data.pedidos },
-      { "Métrica": "Ticket promedio", "Valor ($)": data.ticket },
-      { "Métrica": "Productos activos", "Valor ($)": data.productosActivos },
-      { "Métrica": "Crecimiento", "Valor ($)": data.crecimiento },
-      { "Métrica": "Mejor momento", "Valor ($)": data.mejorMomento },
-      { "Métrica": "Categoría más vendida", "Valor ($)": data.categoriaTop },
+      { Métrica: "Período", "Valor ($)": `${data.etiqueta} · ${data.rango}` },
+      { Métrica: "Ingresos", "Valor ($)": data.ingresos },
+      { Métrica: "Pedidos", "Valor ($)": data.pedidos },
+      { Métrica: "Ticket promedio", "Valor ($)": data.ticket },
+      { Métrica: "Productos activos", "Valor ($)": data.productosActivos },
+      { Métrica: "Crecimiento", "Valor ($)": data.crecimiento },
+      { Métrica: "Mejor momento", "Valor ($)": data.mejorMomento },
+      { Métrica: "Categoría más vendida", "Valor ($)": data.categoriaTop },
     ];
-    const evolucion = data.serie.map((s) => ({ "Período": s.label, "Total ($)": s.valor }));
+    const evolucion = data.serie.map((s) => ({ Período: s.label, "Total ($)": s.valor }));
     const productos = topProducts.map((p) => ({
       "Nombre del Item": p.nombre,
-      "Unidades": p.uds,
+      Unidades: p.uds,
       "Total ($)": p.total,
     }));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumen), "Resumen");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(evolucion), "Evolución");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(productos), "Top Productos");
-    XLSX.writeFile(wb, `sam-guchi-reporte-${periodo}-${opcion.id}-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    XLSX.writeFile(
+      wb,
+      `sam-guchi-reporte-${periodo}-${opcion.id}-${new Date().toISOString().slice(0, 10)}.xlsx`,
+    );
     toast.success(`Reporte ${data.etiqueta.toLowerCase()} exportado`);
   };
 
@@ -900,7 +1201,9 @@ function ReportesView() {
               key={p}
               onClick={() => cambiarPeriodo(p)}
               className={`rounded-full px-4 py-1.5 text-sm font-semibold capitalize transition ${
-                periodo === p ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                periodo === p
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {p}
@@ -924,12 +1227,31 @@ function ReportesView() {
         </label>
       </div>
 
-
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard icon={<DollarSign className="h-5 w-5 text-emerald-600" />} bg="bg-emerald-50" label="Ingresos" value={formatARS(data.ingresos)} />
-        <StatCard icon={<LayoutGrid className="h-5 w-5 text-blue-600" />} bg="bg-blue-50" label="Pedidos" value={String(data.pedidos)} />
-        <StatCard icon={<BarChart3 className="h-5 w-5 text-amber-600" />} bg="bg-amber-50" label="Ticket promedio" value={formatARS(data.ticket)} />
-        <StatCard icon={<Package className="h-5 w-5 text-purple-600" />} bg="bg-purple-50" label="Productos activos" value={String(data.productosActivos)} />
+        <StatCard
+          icon={<DollarSign className="h-5 w-5 text-emerald-600" />}
+          bg="bg-emerald-50"
+          label="Ingresos"
+          value={formatARS(data.ingresos)}
+        />
+        <StatCard
+          icon={<LayoutGrid className="h-5 w-5 text-blue-600" />}
+          bg="bg-blue-50"
+          label="Pedidos"
+          value={String(data.pedidos)}
+        />
+        <StatCard
+          icon={<BarChart3 className="h-5 w-5 text-amber-600" />}
+          bg="bg-amber-50"
+          label="Ticket promedio"
+          value={formatARS(data.ticket)}
+        />
+        <StatCard
+          icon={<Package className="h-5 w-5 text-purple-600" />}
+          bg="bg-purple-50"
+          label="Productos activos"
+          value={String(data.productosActivos)}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
@@ -942,7 +1264,10 @@ function ReportesView() {
         <h2 className="font-display text-2xl mb-6">{data.serieLabel.toUpperCase()}</h2>
         <div className="flex items-end gap-2 sm:gap-4 h-48">
           {data.serie.map((s) => (
-            <div key={s.label} className="flex-1 flex flex-col items-center justify-end h-full gap-2">
+            <div
+              key={s.label}
+              className="flex-1 flex flex-col items-center justify-end h-full gap-2"
+            >
               <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">
                 {Math.round(s.valor / 1000)}k
               </span>
@@ -951,7 +1276,9 @@ function ReportesView() {
                 style={{ height: `${(s.valor / maxSerie) * 100}%` }}
                 title={`${s.label}: ${formatARS(s.valor)}`}
               />
-              <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground">{s.label}</span>
+              <span className="text-[10px] sm:text-xs font-semibold text-muted-foreground">
+                {s.label}
+              </span>
             </div>
           ))}
         </div>
@@ -967,11 +1294,17 @@ function ReportesView() {
                 <div className="flex items-baseline justify-between mb-1 gap-2">
                   <span className="font-semibold">{p.nombre}</span>
                   <span className="text-sm text-muted-foreground whitespace-nowrap">
-                    {p.uds} uds. <span className="ml-3 font-display text-lg text-primary">{formatARS(p.total)}</span>
+                    {p.uds} uds.{" "}
+                    <span className="ml-3 font-display text-lg text-primary">
+                      {formatARS(p.total)}
+                    </span>
                   </span>
                 </div>
                 <div className="h-2 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full bg-primary" style={{ width: `${(p.total / maxTotal) * 100}%` }} />
+                  <div
+                    className="h-full bg-primary"
+                    style={{ width: `${(p.total / maxTotal) * 100}%` }}
+                  />
                 </div>
               </div>
             </li>
@@ -991,8 +1324,17 @@ function InfoCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-
-function StatCard({ icon, bg, label, value }: { icon: React.ReactNode; bg: string; label: string; value: string }) {
+function StatCard({
+  icon,
+  bg,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  bg: string;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="rounded-2xl bg-card border border-border p-5">
       <div className={`grid h-11 w-11 place-items-center rounded-xl ${bg}`}>{icon}</div>

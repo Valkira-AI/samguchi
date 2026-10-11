@@ -21,9 +21,7 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold">Página no encontrada</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          La página que buscás no existe.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">La página que buscás no existe.</p>
         <div className="mt-6">
           <Link
             to="/"
@@ -51,12 +49,18 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <p className="mt-2 text-sm text-muted-foreground">Intentá recargar la página.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             Reintentar
           </button>
-          <a href="/" className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent">
+          <a
+            href="/"
+            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
+          >
             Ir al inicio
           </a>
         </div>
@@ -71,22 +75,45 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Sam Guchi — Sándwiches artesanales de Jujuy" },
-      { name: "description", content: "Sam Guchi: sándwiches, lomitos, milanesas y choripán. Pedí online y retirá tu pedido." },
+      {
+        name: "description",
+        content:
+          "Sam Guchi: sándwiches, lomitos, milanesas y choripán. Pedí online y retirá tu pedido.",
+      },
       { property: "og:title", content: "Sam Guchi — Sándwiches artesanales de Jujuy" },
-      { property: "og:description", content: "Sam Guchi: sándwiches, lomitos, milanesas y choripán. Pedí online y retirá tu pedido." },
+      {
+        property: "og:description",
+        content:
+          "Sam Guchi: sándwiches, lomitos, milanesas y choripán. Pedí online y retirá tu pedido.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Sam Guchi — Sándwiches artesanales de Jujuy" },
-      { name: "twitter:description", content: "Sam Guchi: sándwiches, lomitos, milanesas y choripán. Pedí online y retirá tu pedido." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/758b5380-735e-4739-b603-b87614e65a87/id-preview-f4f85d87--b936a1e2-0e55-4272-812e-548c33eca175.lovable.app-1783213331780.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/758b5380-735e-4739-b603-b87614e65a87/id-preview-f4f85d87--b936a1e2-0e55-4272-812e-548c33eca175.lovable.app-1783213331780.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Sam Guchi: sándwiches, lomitos, milanesas y choripán. Pedí online y retirá tu pedido.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/758b5380-735e-4739-b603-b87614e65a87/id-preview-f4f85d87--b936a1e2-0e55-4272-812e-548c33eca175.lovable.app-1783213331780.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/758b5380-735e-4739-b603-b87614e65a87/id-preview-f4f85d87--b936a1e2-0e55-4272-812e-548c33eca175.lovable.app-1783213331780.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Baloo+2:wght@600;700;800&display=swap" },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Baloo+2:wght@600;700;800&display=swap",
+      },
+      { rel: "icon", href: `${import.meta.env.BASE_URL}favicon.ico`, type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,

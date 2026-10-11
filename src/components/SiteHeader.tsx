@@ -1,9 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import logoAsset from "@/assets/logosamguchi.png.asset.json";
+import logo from "@/assets/logo.png";
 import { useLang, type Lang } from "@/lib/i18n";
-
-const logo = logoAsset.url;
 
 const NAV = [
   { to: "/", key: "nav.inicio", exact: true },
@@ -27,7 +25,9 @@ function LangSwitch() {
           onClick={() => setLang(l)}
           aria-pressed={lang === l}
           className={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase transition ${
-            lang === l ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-primary"
+            lang === l
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:text-primary"
           }`}
         >
           {l}
@@ -42,9 +42,14 @@ export function SiteHeader({ action }: { action?: ReactNode }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-center gap-3 px-4 py-3 md:justify-between">
-
         <Link to="/" className="flex items-center gap-3">
-          <img src={logo} alt="Sam Guchi" width={44} height={44} className="h-11 w-11 object-contain" />
+          <img
+            src={logo}
+            alt="Sam Guchi"
+            width={44}
+            height={44}
+            className="h-11 w-11 object-contain"
+          />
           <span className="leading-none">
             <span className="block font-display text-2xl text-primary">Sam Guchi</span>
             <span className="block text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
@@ -85,7 +90,9 @@ export function SiteHeader({ action }: { action?: ReactNode }) {
             {t(n.key)}
           </Link>
         ))}
-        <span className="ml-1"><LangSwitch /></span>
+        <span className="ml-1">
+          <LangSwitch />
+        </span>
       </nav>
     </header>
   );
