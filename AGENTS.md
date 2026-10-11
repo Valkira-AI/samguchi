@@ -1,10 +1,10 @@
-<!-- LOVABLE:BEGIN -->
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
+# Sam Guchi
+
+Sitio web de venta de sándwiches artesanales de Jujuy: catálogo público (inicio,
+menú, nosotros, contacto) y panel de administración con pedidos, catálogo,
+personal y reportes.
+
+- Stack: TanStack Start + React + TypeScript + Vite + Tailwind CSS.
+- Datos: almacenados en el navegador (`localStorage`) y en módulos declarativos.
+- Despliegue: GitHub Pages mediante el workflow `.github/workflows/deploy.yml`.
+- Acceso admin: contraseña validada por hash en `src/lib/admin-gate.ts`.

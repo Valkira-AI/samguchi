@@ -8,10 +8,9 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
 import { SiteFooter } from "@/components/SiteFooter";
 
@@ -38,9 +37,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -96,13 +92,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/758b5380-735e-4739-b603-b87614e65a87/id-preview-f4f85d87--b936a1e2-0e55-4272-812e-548c33eca175.lovable.app-1783213331780.png",
+        content: "https://Valkira-AI.github.io/samguchi/og-image.jpg",
       },
       {
         name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/758b5380-735e-4739-b603-b87614e65a87/id-preview-f4f85d87--b936a1e2-0e55-4272-812e-548c33eca175.lovable.app-1783213331780.png",
+        content: "https://Valkira-AI.github.io/samguchi/og-image.jpg",
       },
     ],
     links: [
